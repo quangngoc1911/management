@@ -1,20 +1,53 @@
+using Microsoft.EntityFrameworkCore;
+using MyAPI.Data;
+using MyAPI.Interfaces;
+using MyAPI.Repositories;
+using MyAPI.Services;
+using MyAPI.Configurations;
+using MyAPI.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ===========================
+// Add services
+// ===========================
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Database
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configuration
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("JwtSettings"));
+
+// Dependency Injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ===========================
+// Middleware
+// ===========================
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Global error handler
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
