@@ -1,7 +1,16 @@
-import type { NextConfig } from "next";
+const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/backend/:path*',
+        destination: 'http://localhost:5218/api/:path*',
+      },
+      {
+        source: '/WeatherForecast',
+        destination: 'http://localhost:5218/WeatherForecast',
+      },
+    ]
+  },
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+export default nextConfig
