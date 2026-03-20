@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+
+using MyAPI.Configurations;
 using MyAPI.Data;
 using MyAPI.Interfaces;
+using MyAPI.Middleware;
 using MyAPI.Repositories;
 using MyAPI.Services;
-using MyAPI.Configurations;
-using MyAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,7 @@ builder.Services.AddControllers();
 
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddCors(options =>

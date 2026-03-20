@@ -1,7 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+
 using MyAPI.Data;
 using MyAPI.Interfaces;
 using MyAPI.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace MyAPI.Repositories;
 
