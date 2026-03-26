@@ -5,7 +5,7 @@ namespace MyAPI.Interfaces;
 
 public interface IUserService
 {
-    Task<List<User>> GetUsers();
-
-    Task<User> CreateUser(UserDTO dto);
+    Task<List<UserDto>> GetUsers();
+    Task<UserDto> CreateUser(UserDto dto);
+    Task<UserDto> RegisterAsync(RegisterRequest request);
 }

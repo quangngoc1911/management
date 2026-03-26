@@ -1,77 +1,75 @@
-'use client'
-import { useUsers, useCreateUser } from '../hooks/useUsers'
-import { useState } from 'react'
+'use client';
+
+import { useUsers, useCreateUser } from '../hooks/useUsers';
+import { Input } from '@/shared/components/Input';
+import { Button } from '@/shared/components/Button';
+import { Table } from '@/shared/components/Table';
+import { useForm, Errors } from '@/shared/hooks/useForm';
+import { CreateUserDto, User } from '../types';
 
 export function UserList() {
-    const { data: users, isLoading, isError } = useUsers()
-    const { mutate: createUser, isPending } = useCreateUser()
+    const { data: users = [], isLoading, isError } = useUsers();
+    const { mutate: createUser, isPending } = useCreateUser();
 
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
+    const form = useForm<CreateUserDto>({ name: '', email: '' }, (values) => {
+        const errors: Errors<CreateUserDto> = {};
 
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        if (!name || !email) return
-        createUser({ name, email }, {
+        if (!values.name) {
+            errors.name = 'Tên không được bỏ trống';
+        }
+
+        if (!values.email) {
+            errors.email = 'Email không được bỏ trống';
+        } else if (!values.email.includes('@')) {
+            errors.email = 'Email không hợp lệ';
+        }
+
+        return errors;
+    });
+
+    const onSubmit = (values: CreateUserDto) => {
+        createUser(values, {
             onSuccess: () => {
-                setName('')
-                setEmail('')
+                form.setValues({ name: '', email: '' });
             },
-        })
-    }
+        });
+    };
 
-    if (isLoading) return <p>Đang tải...</p>
-    if (isError) return <p className="text-red-500">Lỗi kết nối API</p>
+    if (isLoading) return <p>Đang tải...</p>;
+    if (isError) return <p className="text-red-500">Lỗi API</p>;
 
     return (
-        <div>
-            {/* Form tạo user */}
-            <form onSubmit={handleSubmit} className="flex gap-3 mb-8">
-                <input
-                    value={name}
-                    onChange={e => setName(e.target.value)}
+        <div className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-3">
+                <Input
+                    name="name"
+                    value={form.values.name}
+                    onChange={form.handleChange}
                     placeholder="Tên"
-                    className="border px-3 py-2 rounded w-48"
+                    error={form.errors.name}
                 />
-                <input
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
+
+                <Input
+                    name="email"
+                    value={form.values.email}
+                    onChange={form.handleChange}
                     placeholder="Email"
-                    className="border px-3 py-2 rounded w-64"
+                    error={form.errors.email}
                 />
-                <button
-                    type="submit"
-                    disabled={isPending}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                    {isPending ? 'Đang lưu...' : 'Thêm user'}
-                </button>
+
+                <Button type="submit" loading={isPending}>
+                    Thêm users
+                </Button>
             </form>
 
-            {/* Danh sách */}
-            <table className="w-full border-collapse">
-                <thead>
-                    <tr className="bg-gray-100 text-left">
-                        <th className="border px-4 py-2">Tên</th>
-                        <th className="border px-4 py-2">Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users?.map((user, i) => (
-                        <tr key={user.id ?? i} className="hover:bg-gray-50">
-                            <td className="border px-4 py-2">{user.name}</td>
-                            <td className="border px-4 py-2">{user.email}</td>
-                        </tr>
-                    ))}
-                    {users?.length === 0 && (
-                        <tr>
-                            <td colSpan={2} className="text-center py-4 text-gray-400">
-                                Chưa có user nào
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+            <Table<User>
+                data={users}
+                columns={[
+                    { header: 'Tên', accessor: 'name' },
+                    { header: 'Email', accessor: 'email' },
+                    { header: 'Phone', accessor: 'phone' },
+                ]}
+            />
         </div>
-    )
+    );
 }

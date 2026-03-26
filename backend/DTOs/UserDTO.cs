@@ -1,8 +1,13 @@
 namespace MyAPI.DTOs;
 
-public class UserDTO
+public class UserDto
 {
-    public string Name { get; set; }
-
-    public string Email { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string Role { get; set; } = null!;
+    public string? Department { get; set; }
+    public string? AvatarUrl { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

@@ -1,33 +1,21 @@
 namespace MyAPI.Models;
 
-using System.ComponentModel.DataAnnotations;
-
-public class User
+public class User : BaseEntity
 {
-    public int UserId { get; set; }
-    [StringLength(150)]
-    public string? Name { get; set; }
-    [StringLength(256)]
-    public string? Email { get; set; }
-    [MaxLength(500)]
-    public string? PasswordHash { get; set; }
-    [MaxLength(20)]
-    public string? Role { get; set; }
-    [MaxLength(50)]
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public string Role { get; set; } = "Viewer";
+
     public string? AvatarUrl { get; set; }
+    public string? Department { get; set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime? LastLoginAt { get; set; }
 
-    public string? LastLoginAt { get; set; }
-
-    public string? CreatedAt { get; set; }
-
-    public string? UpdatedAt { get; set; }
-
-    public string? IsDeleted { get; set; }
-
-    public List<Documents> Documents { get; set; }
-    public List<Bookmarks> Bookmarks { get; set; }
-    public List<ViewHistories> ViewHistories { get; set; }
-    public List<RefreshTokens> RefreshTokens { get; set; }
-
-
+    public ICollection<Document> CreatedDocuments { get; set; } = new List<Document>();
+    public ICollection<DocumentVersion> EditedVersions { get; set; } = new List<DocumentVersion>();
+    public ICollection<DocumentFile> UploadedFiles { get; set; } = new List<DocumentFile>();
+    public ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
+    public ICollection<ViewHistory> ViewHistories { get; set; } = new List<ViewHistory>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

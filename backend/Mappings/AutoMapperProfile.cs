@@ -9,7 +9,12 @@ public class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {
-        CreateMap<User, UserDTO>();
-        CreateMap<UserDTO, User>();
+        CreateMap<User, UserDto>();
+
+        CreateMap<UserDto, User>();
+
+        // Nếu muốn ignore field đặc biệt (optional)
+        CreateMap<RegisterRequest, User>()
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
     }
 }
