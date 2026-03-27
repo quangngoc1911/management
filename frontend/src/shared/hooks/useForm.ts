@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 
-type Errors<T> = Partial<Record<keyof T, string>>
+export type Errors<T> = Partial<Record<keyof T, string>>;
 
-export function useForm<T extends Record<string, unknown>>(
+export function useForm<T>(
   initialValues: T,
   validate: (values: T) => Errors<T>
 ) {

@@ -1,7 +1,6 @@
-// src/shared/hooks/useAuth.ts
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";  // ← đổi next/router → next/navigation
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { authApi } from "../api/auth.client";
 import { LoginRequest } from "../types/auth";

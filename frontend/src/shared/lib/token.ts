@@ -1,4 +1,3 @@
-// src/shared/lib/token.ts
 import Cookies from "js-cookie";
 
 // Lấy access token

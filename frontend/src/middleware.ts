@@ -1,4 +1,4 @@
-// src/middleware.ts — bảo vệ tất cả route dashboard, đặt ở src/, ngang với app/
+// bảo vệ tất cả route dashboard, đặt ở src/, ngang với app/
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
