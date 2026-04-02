@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { CreateMenuRequest, Menu } from "../types/menu";
-import { getErrorMessage } from "../utils/error";
-import { menuApi } from "../api/menu.client";
+import { getErrorMessage } from "../../../shared/utils/error";
+import { menuApi } from "../services/menu.client";
 
 
 export function useMenu() {
@@ -39,7 +39,7 @@ export function useMenu() {
     }
   };
 
-  useEffect(() => { fetchMenus(); }, []);
+  // useEffect(() => { fetchMenus(); }, []);
 
   return { menus, loading, error, createMenu, fetchMenus };
 }

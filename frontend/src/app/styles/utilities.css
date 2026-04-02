@@ -1,0 +1,102 @@
+/* ================================================================
+   utilities.css — CUSTOM UTILITIES
+   Helper class nhỏ lẻ không thuộc về component cụ thể nào.
+
+   CHỈNH SỬA FILE NÀY KHI:
+   - Cần class tiện ích Tailwind không có sẵn
+   - Tạo shorthand cho pattern CSS lặp lại
+   - Thêm animation / keyframe tùy chỉnh
+
+   QUY TẮC:
+   - Dùng @layer utilities → cùng độ ưu tiên với Tailwind utilities
+   - Mỗi class chỉ làm 1 việc (single responsibility)
+   - Nếu class phức tạp hơn 3 thuộc tính → chuyển sang components.css
+   ================================================================ */
+
+@layer utilities {
+    /* ── TRUNCATE MULTILINE ──────────────────────────────────────
+     Cắt chữ sau N dòng, hiện "...". Tailwind chỉ có line-clamp.
+
+     CÁCH DÙNG:
+       <p className="line-clamp-2">Đoạn văn dài...</p>   ← Tailwind có sẵn
+       <p className="clamp-3">Đoạn văn dài...</p>        ← class tùy chỉnh
+  ─────────────────────────────────────────────────────────────── */
+    .clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* ── HIDE SCROLLBAR ──────────────────────────────────────────
+     Ẩn scrollbar nhưng vẫn cuộn được (dùng cho carousel, tab ngang).
+
+     CÁCH DÙNG:
+       <div className="overflow-x-auto scrollbar-hide">
+  ─────────────────────────────────────────────────────────────── */
+    .scrollbar-hide {
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* ── ANIMATE FADE IN ─────────────────────────────────────────
+     Hiệu ứng xuất hiện mượt. Dùng cho modal, toast, dropdown.
+
+     CÁCH DÙNG:
+       <div className="animate-fade-in">...</div>
+  ─────────────────────────────────────────────────────────────── */
+    .animate-fade-in {
+        animation: fadeIn var(--duration-normal) var(--ease-default);
+    }
+
+    /* ── ANIMATE SLIDE DOWN ──────────────────────────────────────
+     Hiệu ứng trượt xuống. Dùng cho dropdown menu.
+
+     CÁCH DÙNG:
+       <div className="animate-slide-down">...</div>
+  ─────────────────────────────────────────────────────────────── */
+    .animate-slide-down {
+        animation: slideDown var(--duration-normal) var(--ease-default);
+    }
+
+    /* ── KEYFRAMES ───────────────────────────────────────────────
+     Định nghĩa animation dùng cho các class ở trên.
+  ─────────────────────────────────────────────────────────────── */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* ================================================================
+   GHI CHÚ — Thêm vào đây sau này khi cần:
+
+   - .animate-slide-up    → toast từ dưới lên
+   - .animate-scale-in    → modal zoom vào
+   - .sr-only             → ẩn visually nhưng screen reader vẫn đọc
+   - .no-select           → không cho bôi đen chữ (drag & drop)
+   - .glass               → glassmorphism background
+   ================================================================ */

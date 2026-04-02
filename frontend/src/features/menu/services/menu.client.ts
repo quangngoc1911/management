@@ -1,7 +1,9 @@
 // lib/api/menu.client.ts
 "use client";
-import { getAuthHeaders } from "../lib/token";
+
+import { getAuthHeaders } from "@/shared/lib/token";
 import { CreateMenuRequest, Menu } from "../types/menu";
+
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 

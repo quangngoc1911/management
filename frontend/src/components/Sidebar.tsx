@@ -1,8 +1,8 @@
 'use client';
 
-import { ThemeToggle } from '@/shared/components/ThemeToggle';
-import { useAuth } from '@/shared/hooks/useAuth';
-import { Menu } from '@/shared/types/menu';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { Menu } from '@/features/menu/types/menu';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

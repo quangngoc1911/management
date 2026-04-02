@@ -1,0 +1,270 @@
+/* ================================================================
+   components.css — COMPONENT CLASSES
+   Class tái sử dụng cho các pattern lặp lại nhiều.
+
+   CHỈNH SỬA FILE NÀY KHI:
+   - Thêm component class mới (.btn-primary, .badge...)
+   - Chỉnh style của class có sẵn (.input, .card...)
+   - Tạo shorthand cho chuỗi class Tailwind dài
+
+   QUY TẮC:
+   - Luôn dùng @layer components → Tailwind utility vẫn có thể override
+   - Dùng CSS variable từ tokens.css, không hardcode màu
+   - Tên class dùng BEM-lite: .input, .input-error, .card, .card-header
+   ================================================================ */
+
+@layer components {
+    /* ==============================================================
+     FORM ELEMENTS
+     ============================================================== */
+
+    /* ── .input ──────────────────────────────────────────────────
+     Input cơ bản. Dùng cho: input, textarea, select.
+
+     CÁCH DÙNG:
+       <input className="input" />
+       <textarea className="input resize-none h-32" />
+       <select className="input">
+
+     KHI CÓ LỖI: thêm .input-error
+       <input className="input input-error" />
+  ─────────────────────────────────────────────────────────────── */
+    .input {
+        width: 100%;
+        background-color: var(--surface-alt);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: var(--foreground);
+        outline: none;
+        transition:
+            border-color var(--duration-fast),
+            box-shadow var(--duration-fast);
+    }
+    .input::placeholder {
+        color: var(--muted);
+    }
+    .input:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgb(37 99 235 / 0.15);
+    }
+    .input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .input-error {
+        border-color: var(--color-danger) !important;
+    }
+    .input-error:focus {
+        box-shadow: 0 0 0 3px rgb(220 38 38 / 0.15) !important;
+    }
+
+    /* ==============================================================
+     LAYOUT
+     ============================================================== */
+
+    /* ── .page ───────────────────────────────────────────────────
+     Wrapper chuẩn cho mọi trang trong dashboard.
+     Tự có padding và gap giữa các section.
+
+     CÁCH DÙNG:
+       <div className="page">
+         <h1>Tiêu đề trang</h1>
+         <section>...nội dung...</section>
+       </div>
+  ─────────────────────────────────────────────────────────────── */
+    .page {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    /* ── .page-header ────────────────────────────────────────────
+     Dòng đầu trang: tiêu đề bên trái, action button bên phải.
+
+     CÁCH DÙNG:
+       <div className="page-header">
+         <h1 className="text-2xl font-bold text-foreground">Tiêu đề</h1>
+         <button className="bg-primary ...">Thêm mới</button>
+       </div>
+  ─────────────────────────────────────────────────────────────── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    /* ==============================================================
+     CARD / PANEL
+     ============================================================== */
+
+    /* ── .card ───────────────────────────────────────────────────
+     Khối nội dung nổi lên. Dùng thêm p-6 hoặc overflow-hidden.
+
+     CÁCH DÙNG:
+       <div className="card p-6">...</div>
+       <div className="card shadow-card">...</div>
+       <div className="card overflow-hidden">
+         <div className="card-header">Tiêu đề</div>
+         <div className="p-6">Nội dung</div>
+       </div>
+  ─────────────────────────────────────────────────────────────── */
+    .card {
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+    }
+
+    /* ── .card-header ────────────────────────────────────────────
+     Header của card, có border-bottom phân cách với body.
+  ─────────────────────────────────────────────────────────────── */
+    .card-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        font-weight: 600;
+        color: var(--foreground);
+        font-size: 0.875rem;
+    }
+
+    /* ==============================================================
+     TABLE
+     ============================================================== */
+
+    /* ── .table-wrapper ──────────────────────────────────────────
+     Bọc ngoài table. Tự có bg, border, border-radius.
+     overflow-x: auto → cuộn ngang khi nhiều cột / màn nhỏ.
+
+     CÁCH DÙNG:
+       <div className="table-wrapper">
+         <table className="w-full text-sm">
+           ...
+         </table>
+       </div>
+  ─────────────────────────────────────────────────────────────── */
+    .table-wrapper {
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ==============================================================
+     FORM SECTION
+     ============================================================== */
+
+    /* ── .form-section ───────────────────────────────────────────
+     Nhóm các field liên quan trong form dài.
+     h2/h3 đầu tiên tự có border-bottom làm tiêu đề nhóm.
+
+     CÁCH DÙNG:
+       <div className="form-section">
+         <h3>Thông tin cơ bản</h3>
+         <div className="grid grid-cols-2 gap-4">
+           ...fields...
+         </div>
+       </div>
+  ─────────────────────────────────────────────────────────────── */
+    .form-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem;
+        background-color: var(--surface-alt);
+        border-radius: var(--radius-lg);
+    }
+    .form-section > h2,
+    .form-section > h3 {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--foreground);
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 0;
+    }
+
+    /* ==============================================================
+     BADGE / STATUS TAG
+     ============================================================== */
+
+    /* ── .badge ──────────────────────────────────────────────────
+     Base cho mọi badge. Kết hợp với modifier màu bên dưới.
+
+     CÁCH DÙNG:
+       <span className="badge badge-success">Hoạt động</span>
+       <span className="badge badge-danger">Dừng</span>
+       <span className="badge badge-warning">Chờ duyệt</span>
+       <span className="badge badge-info">Thông tin</span>
+       <span className="badge badge-neutral">Ẩn</span>
+  ─────────────────────────────────────────────────────────────── */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem 0.5rem;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+
+    .badge-success {
+        background-color: #dcfce7;
+        color: #15803d;
+    }
+    .badge-danger {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    .badge-warning {
+        background-color: #fef9c3;
+        color: #a16207;
+    }
+    .badge-info {
+        background-color: #e0f2fe;
+        color: #0369a1;
+    }
+    .badge-neutral {
+        background-color: var(--surface-alt);
+        color: var(--muted);
+    }
+
+    /* Dark mode cho badge — màu cố định nên phải dùng .dark selector */
+    .dark .badge-success {
+        background-color: rgb(21 128 61 / 0.2);
+        color: #86efac;
+    }
+    .dark .badge-danger {
+        background-color: rgb(185 28 28 / 0.2);
+        color: #fca5a5;
+    }
+    .dark .badge-warning {
+        background-color: rgb(161 98 7 / 0.2);
+        color: #fde047;
+    }
+    .dark .badge-info {
+        background-color: rgb(3 105 161 / 0.2);
+        color: #7dd3fc;
+    }
+
+    /* ==============================================================
+     DIVIDER
+     ============================================================== */
+
+    /* ── .divider ────────────────────────────────────────────────
+     Đường kẻ ngang đơn giản.
+
+     CÁCH DÙNG:
+       <hr className="divider" />
+       <hr className="divider my-6" />
+  ─────────────────────────────────────────────────────────────── */
+    .divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 0;
+    }
+}

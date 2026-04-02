@@ -1,32 +1,49 @@
 'use client'
 import { useWeather } from '../hooks/useWeather'
 
+ 
 export function WeatherList() {
-    const { data, isLoading, isError } = useWeather()
+    const { data, isLoading, isError } = useWeather();
 
-    if (isLoading) return <p>Đang tải...</p>
-    if (isError) return <p className="text-red-500">Lỗi kết nối API</p>
+    if (isLoading) return <p className="text-sm text-muted animate-pulse">Đang tải...</p>;
+    if (isError) return <p className="text-sm text-danger">Lỗi kết nối API</p>;
 
     return (
-        <table className="w-full border-collapse">
-            <thead>
-                <tr className="bg-gray-100 text-left">
-                    <th className="border px-4 py-2">Ngày</th>
-                    <th className="border px-4 py-2">°C</th>
-                    <th className="border px-4 py-2">°F</th>
-                    <th className="border px-4 py-2">Mô tả</th>
-                </tr>
-            </thead>
-            <tbody>
-                {data?.map((w, i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                        <td className="border px-4 py-2">{w.date}</td>
-                        <td className="border px-4 py-2">{w.temperatureC}</td>
-                        <td className="border px-4 py-2">{w.temperatureF}</td>
-                        <td className="border px-4 py-2">{w.summary}</td>
+        <div className="table-wrapper">
+            <table className="w-full text-sm">
+                <thead>
+                    {/* ✅ bg-surface-alt thay vì bg-gray-100 */}
+                    <tr className="bg-surface-alt border-b border-border">
+                        {['Ngày', '°C', '°F', 'Mô tả'].map((h) => (
+                            <th
+                                key={h}
+                                className="px-4 py-3 text-left text-xs font-semibold
+                                           text-muted uppercase tracking-wide"
+                            >
+                                {h}
+                            </th>
+                        ))}
                     </tr>
-                ))}
-            </tbody>
-        </table>
-    )
+                </thead>
+                <tbody className="divide-y divide-border">
+                    {data?.map((w, i) => (
+                        /* ✅ hover:bg-surface-alt thay vì hover:bg-gray-50 */
+                        <tr key={i} className="hover:bg-surface-alt transition-colors">
+                            <td className="px-4 py-3 text-foreground">{w.date}</td>
+                            <td className="px-4 py-3 text-foreground">{w.temperatureC}</td>
+                            <td className="px-4 py-3 text-foreground">{w.temperatureF}</td>
+                            <td className="px-4 py-3 text-muted">{w.summary}</td>
+                        </tr>
+                    ))}
+                    {(!data || data.length === 0) && (
+                        <tr>
+                            <td colSpan={4} className="px-4 py-10 text-center text-muted">
+                                Không có dữ liệu
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+    );
 }

@@ -1,0 +1,153 @@
+/* ================================================================
+   tokens.css — DESIGN TOKENS
+   Khai báo tất cả giá trị thiết kế của hệ thống.
+
+   CHỈNH SỬA FILE NÀY KHI:
+   - Đổi màu brand (primary, danger...)
+   - Thêm màu mới vào hệ thống
+   - Điều chỉnh giao diện light / dark
+   - Thêm token mới (shadow, spacing...)
+
+   KHÔNG đặt CSS style ở đây, chỉ khai báo giá trị.
+   ================================================================ */
+
+/* ================================================================
+   1. TAILWIND THEME
+   Khai báo tên class Tailwind → dùng được ngay: bg-surface, text-muted...
+   ================================================================ */
+@theme inline {
+    /* ── SEMANTIC COLORS ─────────────────────────────────────────
+     Tự động đổi sáng/tối. Dùng nhóm này là chủ yếu.
+
+     bg-background    → nền toàn trang
+     bg-surface       → card, modal, form, panel
+     bg-surface-alt   → input, thead table, tag, badge
+     text-foreground  → chữ chính
+     text-muted       → chữ phụ, placeholder, caption, hint
+     border-border    → viền input, card, divider, table
+  ─────────────────────────────────────────────────────────────── */
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-surface: var(--surface);
+    --color-surface-alt: var(--surface-alt);
+    --color-border: var(--border);
+    --color-muted: var(--muted);
+
+    /* ── BRAND / ACTION COLORS ───────────────────────────────────
+     Màu cố định, KHÔNG đổi theo theme.
+
+     bg-primary / text-primary    → nút chính, link, focus ring
+     bg-primary-hover             → hover state nút chính
+     bg-danger  / text-danger     → xóa, lỗi validation
+     bg-danger-hover              → hover state nút danger
+     bg-success / text-success    → thành công, badge active
+     bg-warning / text-warning    → cảnh báo, badge pending
+     bg-info    / text-info       → thông tin, badge info
+  ─────────────────────────────────────────────────────────────── */
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-danger: #dc2626;
+    --color-danger-hover: #b91c1c;
+    --color-success: #16a34a;
+    --color-warning: #d97706;
+    --color-info: #0891b2;
+
+    /* ── SIDEBAR COLORS ──────────────────────────────────────────
+     Sidebar luôn tối, độc lập với light/dark của trang chính.
+
+     bg-sidebar           → nền sidebar
+     text-sidebar-muted   → chữ phụ, icon menu
+     border-sidebar-border → đường kẻ phân cách trong sidebar
+  ─────────────────────────────────────────────────────────────── */
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-muted: var(--sidebar-muted);
+    --color-sidebar-border: var(--sidebar-border);
+
+    /* ── BORDER RADIUS ───────────────────────────────────────────
+     rounded-sm   → checkbox, badge nhỏ, tag
+     rounded-md   → input, button          ← dùng nhiều nhất
+     rounded-lg   → card, dropdown, modal
+     rounded-xl   → card lớn, panel nổi bật
+     rounded-full → avatar, pill badge, toggle
+  ─────────────────────────────────────────────────────────────── */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-full: 9999px;
+
+    /* ── SHADOW ──────────────────────────────────────────────────
+     shadow-card  → card thông thường
+     shadow-modal → dialog, dropdown nổi lên trên
+  ─────────────────────────────────────────────────────────────── */
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-modal: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    /* ── TRANSITION ──────────────────────────────────────────────
+     duration-fast   → hover màu nền, đổi icon          (150ms)
+     duration-normal → mở dropdown, slide panel         (200ms)
+     duration-slow   → animation trang, skeleton load   (300ms)
+     ease-default    → easing chuẩn hầu hết animation
+  ─────────────────────────────────────────────────────────────── */
+    --duration-fast: 150ms;
+    --duration-normal: 200ms;
+    --duration-slow: 300ms;
+    --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* ── Z-INDEX ─────────────────────────────────────────────────
+     Dùng z-dropdown, z-modal... thay vì số cứng z-10, z-50.
+     Thứ tự tăng dần: dropdown → sticky → overlay → modal → toast → tooltip
+
+     z-dropdown  → menu dropdown, popover
+     z-sticky    → header sticky, sidebar fixed
+     z-overlay   → nền mờ phía sau modal
+     z-modal     → dialog, drawer
+     z-toast     → thông báo góc màn hình
+     z-tooltip   → tooltip
+  ─────────────────────────────────────────────────────────────── */
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-overlay: 300;
+    --z-modal: 400;
+    --z-toast: 500;
+    --z-tooltip: 600;
+}
+
+/* ================================================================
+   2. LIGHT MODE (mặc định)
+   Chỉnh màu tại đây để thay đổi toàn bộ giao diện sáng.
+   ================================================================ */
+:root {
+    color-scheme: light;
+
+    --background: #f9fafb; /* gray-50  — nền trang, hơi xám nhẹ  */
+    --foreground: #111827; /* gray-900 — chữ đậm, dễ đọc         */
+    --surface: #ffffff; /* trắng    — card, form, modal        */
+    --surface-alt: #f3f4f6; /* gray-100 — input bg, thead, tag     */
+    --border: #e5e7eb; /* gray-200 — viền nhẹ                 */
+    --muted: #6b7280; /* gray-500 — chữ phụ, placeholder     */
+
+    --sidebar: #111827; /* gray-900 — sidebar tối trong light  */
+    --sidebar-muted: #9ca3af; /* gray-400                            */
+    --sidebar-border: #374151; /* gray-700                            */
+}
+
+/* ================================================================
+   3. DARK MODE
+   Kích hoạt khi <html class="dark"> — do next-themes xử lý.
+   Chỉ đổi giá trị biến ở đây, KHÔNG cần sửa bất kỳ component nào.
+   ================================================================ */
+.dark {
+    color-scheme: dark;
+
+    --background: #0f172a; /* slate-900 — nền trang tối           */
+    --foreground: #f1f5f9; /* slate-100 — chữ sáng                */
+    --surface: #1e293b; /* slate-800 — card, form              */
+    --surface-alt: #334155; /* slate-700 — input bg, thead         */
+    --border: #334155; /* slate-700 — viền                    */
+    --muted: #94a3b8; /* slate-400 — chữ phụ                 */
+
+    --sidebar: #0f172a; /* slate-900                           */
+    --sidebar-muted: #64748b; /* slate-500                           */
+    --sidebar-border: #1e293b; /* slate-800                           */
+}

@@ -1,20 +1,23 @@
 'use client';
-import { useMenu } from '@/shared/hooks/useMenu';
-import MenuForm from './components/MenuForm';
+import { useMenu } from '@/features/menu/hooks/useMenu';
+import MenuForm from '../../../features/menu/components/MenuForm';
+
 
 export default function MenuPage() {
     const { menus, loading } = useMenu();
 
     return (
-        <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-foreground">Quản lý Menu</h1>
+        <>
+            <div className="page-header">
+                <h1 className="text-2xl font-bold text-foreground">Quản lý Menu</h1>
+            </div>
 
             <MenuForm />
 
             {loading ? (
                 <p className="text-sm text-muted animate-pulse">Đang tải...</p>
             ) : (
-                <div className="bg-surface border border-border rounded-lg overflow-hidden">
+                <div className="table-wrapper">
                     <table className="w-full text-sm">
                         <thead className="bg-surface-alt border-b border-border">
                             <tr>
@@ -38,10 +41,8 @@ export default function MenuPage() {
                                     <td className="px-4 py-3">
                                         <span
                                             className={[
-                                                'px-2 py-0.5 rounded-full text-xs font-medium',
-                                                m.isVisible
-                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                    : 'bg-surface-alt text-muted',
+                                                'badge',
+                                                m.isVisible ? 'badge-success' : 'badge-neutral',
                                             ].join(' ')}
                                         >
                                             {m.isVisible ? 'Hiện' : 'Ẩn'}
@@ -49,10 +50,20 @@ export default function MenuPage() {
                                     </td>
                                 </tr>
                             ))}
+                            {menus.length === 0 && (
+                                <tr>
+                                    <td
+                                        colSpan={4}
+                                        className="px-4 py-10 text-center text-muted text-sm"
+                                    >
+                                        Không có dữ liệu
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
             )}
-        </div>
+        </>
     );
 }

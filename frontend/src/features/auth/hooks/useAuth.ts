@@ -2,16 +2,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { authApi } from "../api/auth.client";
 import { LoginRequest } from "../types/auth";
-import { clearTokens } from "../lib/token";
-import { getErrorMessage } from "../utils/error";
+import { clearTokens } from "../../../shared/lib/token";
+import { getErrorMessage } from "../../../shared/utils/error";
+import { authApi } from "../services/auth.client";
 
 export function useAuth() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
-
+  console.log("LOGIN SUCCESS → redirect menus");
+  
   const login = async (data: LoginRequest) => {
     setLoading(true);
     setError(null);
@@ -26,7 +27,8 @@ export function useAuth() {
       });
 
       localStorage.setItem("user", JSON.stringify(res.user));
-      router.push("/menus");
+      const redirectTo = sessionStorage.getItem("redirect") || "/users";
+      router.replace(redirectTo);
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {

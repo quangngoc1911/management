@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 export default function LoginPage() {
     const { login, loading, error } = useAuth();
@@ -8,6 +8,7 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (loading) return;
         await login(form);
     };
 
@@ -31,33 +32,25 @@ export default function LoginPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex flex-col gap-1">
-                        <label className="block text-sm font-medium text-foreground">Email</label>
+                        <label className="text-sm font-medium text-foreground">Email</label>
                         <input
                             type="email"
                             required
                             value={form.email}
                             onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                            className="w-full bg-surface-alt border border-border rounded-md
-                                       px-3 py-2 text-sm text-foreground placeholder:text-muted
-                                       focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
-                                       transition"
+                            className="input"
                             placeholder="user@example.com"
                         />
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="block text-sm font-medium text-foreground">
-                            Mật khẩu
-                        </label>
+                        <label className="text-sm font-medium text-foreground">Mật khẩu</label>
                         <input
                             type="password"
                             required
                             value={form.password}
                             onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                            className="w-full bg-surface-alt border border-border rounded-md
-                                       px-3 py-2 text-sm text-foreground placeholder:text-muted
-                                       focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
-                                       transition"
+                            className="input"
                             placeholder="••••••••"
                         />
                     </div>

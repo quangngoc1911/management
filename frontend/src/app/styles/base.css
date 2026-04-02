@@ -1,0 +1,127 @@
+/* ================================================================
+   base.css — BASE STYLES / RESET
+   Normalize trình duyệt và đặt style nền cho toàn app.
+
+   CHỈNH SỬA FILE NÀY KHI:
+   - Thay đổi font-size gốc của app
+   - Thêm reset cho element HTML mới
+   - Chỉnh scrollbar, selection, focus style
+   - Thay đổi line-height, font-family mặc định
+
+   QUY TẮC:
+   - Luôn dùng @layer base → utility class Tailwind luôn thắng được
+   - KHÔNG đặt border-color trong * { } → conflict với Tailwind border-*
+   - KHÔNG override h1-h6 font-size → để Tailwind text-* quyết định
+   ================================================================ */
+
+@layer base {
+    /* ── BOX SIZING ──────────────────────────────────────────────
+     Đảm bảo padding/border không làm tăng kích thước element.
+     Quan trọng: KHÔNG thêm border-color ở đây.
+  ─────────────────────────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    /* ── HTML ────────────────────────────────────────────────────
+     scroll-behavior: smooth → anchor link cuộn mượt
+     font-smoothing           → chữ sắc nét trên macOS / retina
+  ─────────────────────────────────────────────────────────────── */
+    html {
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* ── BODY ────────────────────────────────────────────────────
+     Dùng CSS variable từ tokens.css → tự đổi theo theme.
+     font-size: 14px phù hợp app quản lý (dashboard, CRUD).
+     Nếu làm landing page / blog → đổi lại 16px.
+  ─────────────────────────────────────────────────────────────── */
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+        min-height: 100dvh;
+        font-size: 0.875rem; /* 14px */
+        line-height: 1.5;
+    }
+
+    /* ── FORM ELEMENTS ───────────────────────────────────────────
+     Mặc định browser dùng system font khác body → chữ lệch.
+     font: inherit → đồng bộ toàn bộ form với font của body.
+  ─────────────────────────────────────────────────────────────── */
+    input,
+    textarea,
+    select,
+    button {
+        font: inherit;
+    }
+
+    /* ── BUTTON ──────────────────────────────────────────────────
+     cursor: pointer mặc định cho mọi button.
+     disabled → cursor: not-allowed thay vì pointer.
+  ─────────────────────────────────────────────────────────────── */
+    button {
+        cursor: pointer;
+    }
+    button:disabled {
+        cursor: not-allowed;
+    }
+
+    /* ── MEDIA ───────────────────────────────────────────────────
+     Không cho ảnh/video vượt quá container.
+     display: block → loại bỏ khoảng trống dưới ảnh (inline default).
+  ─────────────────────────────────────────────────────────────── */
+    img,
+    video {
+        max-width: 100%;
+        display: block;
+    }
+
+    /* ── FOCUS VISIBLE ───────────────────────────────────────────
+     Chỉ hiện outline khi dùng bàn phím Tab (không hiện khi click).
+     Quan trọng cho accessibility.
+  ─────────────────────────────────────────────────────────────── */
+    :focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+        border-radius: var(--radius-sm);
+    }
+
+    /* ── SELECTION ───────────────────────────────────────────────
+     Màu highlight khi bôi đen chữ.
+  ─────────────────────────────────────────────────────────────── */
+    ::selection {
+        background-color: rgb(37 99 235 / 0.15);
+        color: var(--foreground);
+    }
+
+    /* ── SCROLLBAR ───────────────────────────────────────────────
+     Scrollbar mỏng, không chiếm không gian, màu theo theme.
+     Chỉ hoạt động trên Chrome/Edge/Safari.
+     Firefox: dùng scrollbar-width + scrollbar-color bên dưới.
+  ─────────────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--muted);
+    }
+
+    /* Firefox */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+    }
+}

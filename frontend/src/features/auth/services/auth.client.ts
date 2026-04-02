@@ -1,5 +1,7 @@
 // src/shared/api/auth.client.ts
+
 import { AuthResponse, LoginRequest } from "../types/auth";
+
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 

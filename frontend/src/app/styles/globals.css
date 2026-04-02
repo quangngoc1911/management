@@ -1,0 +1,12 @@
+/* ================================================================
+   globals.css — ENTRY POINT
+   Chỉ có nhiệm vụ import, KHÔNG viết CSS trực tiếp ở đây.
+   Thứ tự import quan trọng: tokens → base → components → utilities
+   ================================================================ */
+
+@import 'tailwindcss';
+
+@import './tokens.css'; /* Design tokens: @theme, :root, .dark    */
+@import './base.css'; /* Reset & normalize: html, body, focus... */
+@import './components.css'; /* Class tái sử dụng: .input, .card...     */
+@import './utilities.css'; /* Helper nhỏ nếu cần thêm sau này         */

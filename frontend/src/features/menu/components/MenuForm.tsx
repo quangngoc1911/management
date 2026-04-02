@@ -1,6 +1,6 @@
 'use client';
-import { useMenu } from '@/shared/hooks/useMenu';
-import { CreateMenuRequest } from '@/shared/types/menu';
+import { useMenu } from '@/features/menu/hooks/useMenu';
+import { CreateMenuRequest } from '@/features/menu/types/menu';
 import { useState } from 'react';
 
 // Class dùng lại cho mọi input/select trong form — định nghĩa 1 lần

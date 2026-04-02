@@ -1,7 +1,7 @@
 'use client';
 import { useForm } from '@/shared/hooks/useForm';
-import { Input } from '@/shared/components/Input';
-import { Button } from '@/shared/components/Button';
+import { Input } from '@/components/Input';
+import { Button } from '@/components/Button';
 
 interface CreatePostDto {
     title: string;

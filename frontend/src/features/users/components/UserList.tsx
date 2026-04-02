@@ -1,9 +1,9 @@
 'use client';
 
 import { useUsers, useCreateUser } from '../hooks/useUsers';
-import { Input } from '@/shared/components/Input';
-import { Button } from '@/shared/components/Button';
-import { Table } from '@/shared/components/Table';
+import { Input } from '@/components/Input';
+import { Button } from '@/components/Button';
+import { Table } from '@/components/Table';
 import { useForm, Errors } from '@/shared/hooks/useForm';
 import { CreateUserDto, User } from '../types';
 
