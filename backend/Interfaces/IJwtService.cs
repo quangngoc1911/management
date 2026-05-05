@@ -1,6 +1,8 @@
 using System.Security.Claims;
 
-using MyAPI.Models;
+using ManagementSystem.Entities;
+
+namespace ManagementSystem.Interfaces;
 
 public interface IJwtService
 {

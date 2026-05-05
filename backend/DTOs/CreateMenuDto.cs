@@ -6,6 +6,7 @@ public class CreateMenuDto
     public string? Icon { get; set; }
     public int Order { get; set; } = 0;
     public bool IsVisible { get; set; } = true;
-    // public string? RequiredRole { get; set; }
-    public int? ParentId { get; set; }
+    public int SortOrder { get; set; }
+    public bool IsActive { get; set; } = true;
+    public Guid? ParentId { get; set; }
 }

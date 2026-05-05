@@ -6,8 +6,11 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-using MyAPI.Configurations;
-using MyAPI.Models;
+using ManagementSystem.Configurations;
+using ManagementSystem.Entities;
+using ManagementSystem.Interfaces;
+
+namespace ManagementSystem.Services;
 
 public class JwtService : IJwtService
 {

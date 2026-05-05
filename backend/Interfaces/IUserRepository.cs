@@ -1,15 +1,54 @@
-using MyAPI.DTOs;
-using MyAPI.Models;
+using ManagementSystem.Entities;
 
-namespace MyAPI.Interfaces;
+namespace ManagementSystem.Interfaces;
 
+/// <summary>
+/// Repository interface for User operations (MyAPI namespace)
+/// </summary>
 public interface IUserRepository
 {
-    Task<List<User>> GetAllAsync();
+    /// <summary>
+    /// Get all users
+    /// </summary>
+    Task<IEnumerable<User>> GetAllAsync();
+    
+    /// <summary>
+    /// Get user by ID
+    /// </summary>
+    Task<User?> GetByIdAsync(Guid id);
+    
+    /// <summary>
+    /// Get user by email
+    /// </summary>
     Task<User?> GetByEmailAsync(string email);
-    Task<bool> EmailExistsAsync(string email);
-    Task<List<User>> GetPagedAsync(int skip, int take);
+    
+    /// <summary>
+    /// Create a new user
+    /// </summary>
+    Task CreateAsync(User user);
+    
+    /// <summary>
+    /// Update a user
+    /// </summary>
+    void Update(User user);
+    
+    /// <summary>
+    /// Delete a user
+    /// </summary>
+    void Delete(User user);
+    
+    /// <summary>
+    /// Count users
+    /// </summary>
     Task<int> CountAsync();
-    Task<User> Add(User user);
-    Task<User> AddAsync(User user);
+    
+    /// <summary>
+    /// Get users with pagination
+    /// </summary>
+    Task<IEnumerable<User>> GetPagedAsync(int skip, int take);
+    
+    /// <summary>
+    /// Check if email exists
+    /// </summary>
+    Task<bool> EmailExistsAsync(string email, Guid? excludeId = null);
 }

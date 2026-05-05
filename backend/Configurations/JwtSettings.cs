@@ -1,4 +1,4 @@
-namespace MyAPI.Configurations;
+namespace ManagementSystem.Configurations;
 
 public class JwtSettings
 {

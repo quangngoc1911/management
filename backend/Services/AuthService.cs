@@ -1,33 +1,44 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-using MyAPI.Configurations;
-using MyAPI.Data;
-using MyAPI.DTOs;
-using MyAPI.Interfaces;
-using MyAPI.Models;
+using ManagementSystem.Configurations;
+using ManagementSystem.Data;
+using ManagementSystem.DTOs.Auth;
+using ManagementSystem.DTOs.User;
+using ManagementSystem.Entities;
+using ManagementSystem.Interfaces;
+
+namespace ManagementSystem.Services;
 
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepo;
     private readonly IJwtService _jwtService;
-    private readonly AppDbContext _context;
-    private readonly JwtSettings _settings;
+    private readonly ApplicationDbContext _context;
+    private readonly JwtSettings _jwtSettings;
 
     public AuthService(
         IUserRepository userRepo,
         IJwtService jwtService,
-        AppDbContext context,
-        IOptions<JwtSettings> settings)
+        ApplicationDbContext context,
+        IOptions<JwtSettings> jwtSettings)
     {
         _userRepo = userRepo;
         _jwtService = jwtService;
         _context = context;
-        _settings = settings.Value;
+        _jwtSettings = jwtSettings.Value;
     }
 
-    public async Task<AuthResponse> LoginAsync(LoginRequest request)
+    public async Task<AuthResponse> LoginAsync(LoginDto request)
     {
+        // Validate email format
+        if (string.IsNullOrWhiteSpace(request.Email) || !System.Text.RegularExpressions.Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            throw new UnauthorizedAccessException("Email không hợp lệ");
+
+        // Validate password
+        if (string.IsNullOrWhiteSpace(request.Password))
+            throw new UnauthorizedAccessException("Mật khẩu không được để trống");
+
         // 1. Tìm user
         var user = await _userRepo.GetByEmailAsync(request.Email);
         if (user == null)
@@ -36,7 +47,6 @@ public class AuthService : IAuthService
         // 2. Kiểm tra password
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             throw new UnauthorizedAccessException("Email hoặc mật khẩu không đúng");
-
         // 3. Tạo tokens
         var accessToken = _jwtService.GenerateAccessToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();
@@ -46,8 +56,9 @@ public class AuthService : IAuthService
         {
             UserId = user.Id,
             TokenHash = BCrypt.Net.BCrypt.HashPassword(refreshToken),
-            ExpiresAt = DateTime.UtcNow.AddDays(_settings.RefreshTokenExpiryDays),
-            DeviceInfo = "web"
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays),
+            DeviceInfo = "web",
+            CreatedAt = DateTime.UtcNow // Add CreatedAt
         });
         await _context.SaveChangesAsync();
 
@@ -55,51 +66,71 @@ public class AuthService : IAuthService
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            AccessTokenExpiry = DateTime.UtcNow.AddMinutes(_settings.AccessTokenExpiryMinutes),
-            User = new UserDto { Id = user.Id, Name = user.Name, Email = user.Email }
+            AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
+            User = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Role = user.Role
+            }
         };
     }
 
     public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
     {
-        // Tìm tất cả refresh token chưa hết hạn
+        // Tìm refresh token còn hiệu lực
         var tokens = await _context.RefreshTokens
             .Include(t => t.User)
             .Where(t => t.ExpiresAt > DateTime.UtcNow && !t.IsRevoked)
             .ToListAsync();
 
-        // Tìm token khớp
+        // So khớp token gửi lên
         var stored = tokens.FirstOrDefault(t =>
             BCrypt.Net.BCrypt.Verify(refreshToken, t.TokenHash));
 
-        if (stored == null)
+        if (stored == null || stored.User == null)
             throw new UnauthorizedAccessException("Refresh token không hợp lệ");
 
+        var user = stored.User;
+
         // Tạo token mới
-        var newAccessToken = _jwtService.GenerateAccessToken(stored.User);
+        var newAccessToken = _jwtService.GenerateAccessToken(user);
         var newRefreshToken = _jwtService.GenerateRefreshToken();
 
-        // Xóa token cũ, thêm token mới (rotation)
+        // Revoke token cũ + tạo token mới
         stored.IsRevoked = true;
+
         _context.RefreshTokens.Add(new RefreshToken
         {
             UserId = stored.UserId,
             TokenHash = BCrypt.Net.BCrypt.HashPassword(newRefreshToken),
-            ExpiresAt = DateTime.UtcNow.AddDays(_settings.RefreshTokenExpiryDays)
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays),
+            CreatedAt = DateTime.UtcNow
         });
+
         await _context.SaveChangesAsync();
 
         return new AuthResponse
         {
             AccessToken = newAccessToken,
             RefreshToken = newRefreshToken,
-            AccessTokenExpiry = DateTime.UtcNow.AddMinutes(_settings.AccessTokenExpiryMinutes),
-            User = new UserDto { Id = stored.User.Id, Name = stored.User.Name, Email = stored.User.Email }
+            AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
+            User = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Role = user.Role
+            }
         };
     }
 
-    public async Task LogoutAsync(string refreshToken)
+    public async Task LogoutAsync(string? refreshToken)
     {
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return;
+        }
+
         var tokens = await _context.RefreshTokens
             .Where(t => !t.IsRevoked)
             .ToListAsync();

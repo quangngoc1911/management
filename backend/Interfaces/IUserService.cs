@@ -1,11 +1,16 @@
-using MyAPI.DTOs;
-using MyAPI.Models;
+using ManagementSystem.DTOs.Auth;
+using ManagementSystem.DTOs.Common;
+using ManagementSystem.DTOs.User;
 
-namespace MyAPI.Interfaces;
+namespace ManagementSystem.Interfaces;
 
 public interface IUserService
 {
-    Task<List<UserDto>> GetUsers();
-    Task<UserDto> CreateUser(UserDto dto);
+    Task<PaginatedResultDto<UserDto>> GetAllUsersAsync(PageRequest request);
+    Task<UserDto?> GetUserByIdAsync(Guid id);
+    Task<UserDto?> GetUserByEmailAsync(string email);
+    Task<UserDto> CreateUserAsync(CreateUserDto dto, Guid createdBy);
+    Task<UserDto?> UpdateUserAsync(Guid id, UpdateUserDto dto, Guid updatedBy);
+    Task<bool> DeleteUserAsync(Guid id);
     Task<UserDto> RegisterAsync(RegisterRequest request);
 }

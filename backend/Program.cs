@@ -4,18 +4,22 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-using MyAPI.Configurations;
-using MyAPI.Data;
-using MyAPI.Interfaces;
-using MyAPI.Mappings;
-using MyAPI.Middleware;
-using MyAPI.Repositories;
-using MyAPI.Services;
+using ManagementSystem.Configurations;
+using ManagementSystem.Data;
+using ManagementSystem.Interfaces;
+using ManagementSystem.Mappings;
+using ManagementSystem.Middleware;
+using ManagementSystem.Repositories;
+using ManagementSystem.Services;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-var builder = WebApplication.CreateBuilder(args);
+// Add Serilog configuration (Placeholder for now)
+// builder.Host.UseSerilog((context, configuration) =>
+//     configuration.ReadFrom.Configuration(context.Configuration));
 
+var builder = WebApplication.CreateBuilder(args);
+Console.WriteLine(builder.Environment.EnvironmentName);
 // ===========================
 // Add services
 // ===========================
@@ -32,7 +36,7 @@ builder.Services.AddControllers()
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // Database
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -103,12 +107,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // Dependency Injection
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuService, MenuService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));

@@ -1,10 +1,12 @@
-using MyAPI.Models;
+using ManagementSystem.Entities;
 
-namespace MyAPI.Interfaces;
+namespace ManagementSystem.Interfaces;
 
 public interface IMenuRepository
 {
     Task<List<Menu>> GetMenuTreeAsync();
-    Task<Menu?> GetByIdAsync(int id);       // ← cần để validate ParentId
-    Task AddAsync(Menu menu);
+    Task<Menu?> GetByIdAsync(Guid id);
+    Task CreateAsync(Menu menu);
+    void Update(Menu menu);
+    void Delete(Menu menu);
 }

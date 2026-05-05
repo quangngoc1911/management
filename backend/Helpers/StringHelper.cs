@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MyAPI.Helpers;
+namespace ManagementSystem.Helpers;
 // ============================================================
 // STRING HELPERS — Xử lý chuỗi
 // ============================================================
@@ -24,19 +24,18 @@ public static class StringHelper
             if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 sb.Append(c);
 
-        return sb.ToString()
+        string slug = sb.ToString()
             .Normalize(NormalizationForm.FormC)
             .ToLower()
             .Replace("đ", "d")
-            .Trim()
-            .Replace(" ", "-")
-            .Replace("_", "-")
-            // Xóa ký tự đặc biệt (giữ chữ, số, dấu -)
-            .Replace(Regex.Replace(sb.ToString(), @"[^a-z0-9\-]", ""), "")
-            .Pipe(s => Regex.Replace(s, @"[^a-z0-9\-]", ""))
-            // Xóa dấu -- liên tiếp
-            .Pipe(s => Regex.Replace(s, @"-+", "-"))
-            .Trim('-');
+            .Trim();
+
+        // Thay thế khoảng trắng và các ký tự không hợp lệ bằng dấu gạch ngang
+        slug = Regex.Replace(slug, @"[\s_]+", "-"); // Thay thế khoảng trắng và dấu gạch dưới bằng dấu gạch ngang
+        slug = Regex.Replace(slug, @"[^a-z0-9\-]", ""); // Xóa tất cả các ký tự không phải chữ, số, hoặc dấu gạch ngang
+        slug = Regex.Replace(slug, @"-+", "-"); // Thay thế nhiều dấu gạch ngang liên tiếp bằng một dấu
+
+        return slug.Trim('-'); // Cắt bỏ dấu gạch ngang ở đầu và cuối
     }
 
     /// <summary>

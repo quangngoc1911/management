@@ -1,3 +1,9 @@
+using System.Security.Claims;
+
+using ManagementSystem.Interfaces;
+
+namespace ManagementSystem.Middleware;
+
 public class JwtMiddleware
 {
     private readonly RequestDelegate _next;
