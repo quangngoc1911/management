@@ -10,7 +10,7 @@ interface CreatePostDto {
 
 export default function CreatePostPage() {
     const form = useForm<CreatePostDto>({ title: '', description: '' }, (values) => {
-        const errors: any = {};
+        const errors: Partial<Record<keyof CreatePostDto, string>> = {};
         if (!values.title) errors.title = 'Nhập tiêu đề';
         if (!values.description) errors.description = 'Nhập nội dung';
         return errors;
@@ -37,7 +37,7 @@ export default function CreatePostPage() {
                     <textarea
                         name="description"
                         value={form.values.description}
-                        onChange={form.handleChange as any}
+                        // onChange={form.handleChange}
                         placeholder="Nội dung"
                         className="w-full bg-surface-alt border border-border rounded-md
                                    px-3 py-2 text-sm text-foreground placeholder:text-muted

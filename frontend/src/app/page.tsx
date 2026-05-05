@@ -1,19 +1,22 @@
-import Link from 'next/link';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+const TOKEN_KEY = 'access_token';
 
 export default function HomePage() {
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="text-center space-y-4">
-                <h1 className="text-3xl font-bold text-foreground">Chào mừng</h1>
-                <p className="text-muted text-sm">Vui lòng đăng nhập để sử dụng hệ thống</p>
-                <Link
-                    href="/login"
-                    className="inline-block bg-primary hover:bg-primary-hover
-                               text-white px-6 py-2 rounded-md text-sm font-medium transition"
-                >
-                    Đăng nhập
-                </Link>
-            </div>
-        </div>
-    );
+    const router = useRouter();
+
+    useEffect(() => {
+        const token = localStorage.getItem(TOKEN_KEY);
+
+        if (token) {
+            router.replace('/dashboard');
+        } else {
+            router.replace('/login');
+        }
+    }, [router]);
+
+    return null;
 }

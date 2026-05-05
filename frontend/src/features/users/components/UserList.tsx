@@ -3,7 +3,7 @@
 import { useUsers, useCreateUser } from '../hooks/useUsers';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
-import { Table } from '@/components/Table';
+// import { Table } from '@/components/Table';
 import { useForm, Errors } from '@/shared/hooks/useForm';
 import { CreateUserDto, User } from '../types';
 
@@ -62,14 +62,14 @@ export function UserList() {
                 </Button>
             </form>
 
-            <Table<User>
+            {/* <Table<User>
                 data={users}
                 columns={[
                     { header: 'Tên', accessor: 'name' },
                     { header: 'Email', accessor: 'email' },
                     { header: 'Phone', accessor: 'phone' },
                 ]}
-            />
+            /> */}
         </div>
     );
 }

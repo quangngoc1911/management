@@ -1,23 +1,23 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next';
 import '@/app/styles/globals.css';
-import { Providers } from './providers'
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'My App',
-}
+    title: 'Hệ thống Quản lý Tài liệu',
+    description: 'Document Retrieval System',
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-      <html lang="vi" suppressHydrationWarning>
-          <body className="bg-background text-foreground min-h-screen">
-              <Providers>
-                  <div className="p-6">{children}</div>
-              </Providers>
-          </body>
-      </html>
-  );
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <html lang="vi" suppressHydrationWarning>
+            <body className="bg-background text-foreground min-h-screen">
+                <Providers>{children}</Providers>
+            </body>
+        </html>
+    );
 }

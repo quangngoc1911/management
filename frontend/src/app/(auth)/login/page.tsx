@@ -1,71 +1,133 @@
 'use client';
+
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 
+const loginSchema = z.object({
+    email: z.string().email('Email không hợp lệ'),
+    password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
 export default function LoginPage() {
-    const { login, loading, error } = useAuth();
-    const [form, setForm] = useState({ email: '', password: '' });
+  const router = useRouter();
+  const { login, loading, error } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const {
+      register,
+      handleSubmit,
+      formState: { errors },
+  } = useForm<LoginFormData>({
+      resolver: zodResolver(loginSchema),
+  });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (loading) return;
-        await login(form);
-    };
+  const onSubmit = async (data: LoginFormData) => {
+      await login(data);
+  };
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-            <div
-                className="bg-surface border border-border rounded-lg shadow-sm
-                            w-full max-w-md mx-4 p-8"
-            >
-                <h1 className="text-2xl font-bold mb-6 text-center text-foreground">Đăng nhập</h1>
+  return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+          <div className="w-full max-w-md">
+              {/* Logo / Title */}
+              <div className="text-center mb-8">
+                  <h1 className="text-2xl font-bold text-foreground">Hệ thống Quản lý Tài liệu</h1>
+                  <p className="text-muted mt-2 text-sm">Đăng nhập để tiếp tục</p>
+              </div>
 
-                {error && (
-                    <div
-                        className="mb-4 p-3 rounded-lg text-sm
-                                    bg-red-50 text-red-700
-                                    dark:bg-red-900/20 dark:text-red-400"
-                    >
-                        {error}
-                    </div>
-                )}
+              {/* Login Form */}
+              <div className="card p-8">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                      {/* Email */}
+                      <div>
+                          <label
+                              htmlFor="email"
+                              className="block text-sm font-medium text-foreground mb-2"
+                          >
+                              Email
+                          </label>
+                          <input
+                              id="email"
+                              type="email"
+                              {...register('email')}
+                              className={`input ${errors.email ? 'input-error' : ''}`}
+                              placeholder="Nhập email của bạn"
+                          />
+                          {errors.email && (
+                              <p className="text-danger text-xs mt-1">{errors.email.message}</p>
+                          )}
+                      </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium text-foreground">Email</label>
-                        <input
-                            type="email"
-                            required
-                            value={form.email}
-                            onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                            className="input"
-                            placeholder="user@example.com"
-                        />
-                    </div>
+                      {/* Password */}
+                      <div>
+                          <label
+                              htmlFor="password"
+                              className="block text-sm font-medium text-foreground mb-2"
+                          >
+                              Mật khẩu
+                          </label>
+                          <div className="relative">
+                              <input
+                                  id="password"
+                                  type={showPassword ? 'text' : 'password'}
+                                  {...register('password')}
+                                  className={`input pr-10 ${errors.password ? 'input-error' : ''}`}
+                                  placeholder="Nhập mật khẩu"
+                              />
+                              <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground"
+                              >
+                                  {showPassword ? (
+                                      <EyeOff className="w-4 h-4" />
+                                  ) : (
+                                      <Eye className="w-4 h-4" />
+                                  )}
+                              </button>
+                          </div>
+                          {errors.password && (
+                              <p className="text-danger text-xs mt-1">{errors.password.message}</p>
+                          )}
+                      </div>
 
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium text-foreground">Mật khẩu</label>
-                        <input
-                            type="password"
-                            required
-                            value={form.password}
-                            onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                            className="input"
-                            placeholder="••••••••"
-                        />
-                    </div>
+                      {/* Error Message */}
+                      {error && (
+                          <div className="p-3 rounded-md bg-danger/10 text-danger text-sm">
+                              {error}
+                          </div>
+                      )}
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-primary hover:bg-primary-hover text-white
-                                   py-2 rounded-md text-sm font-medium
-                                   disabled:opacity-50 disabled:cursor-not-allowed transition"
-                    >
-                        {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-                    </button>
-                </form>
-            </div>
-        </div>
-    );
+                      {/* Submit Button */}
+                      <button
+                          type="submit"
+                          disabled={loading}
+                          className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white py-2.5 rounded-md font-medium transition disabled:opacity-50"
+                      >
+                          {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                      </button>
+                  </form>
+
+                  {/* Register Link */}
+                  <div className="mt-6 text-center text-sm text-muted">
+                      Chưa có tài khoản?{' '}
+                      <Link
+                          href="/register"
+                          className="text-primary hover:text-primary-hover font-medium"
+                      >
+                          Đăng ký ngay
+                      </Link>
+                  </div>
+              </div>
+          </div>
+      </div>
+  );
 }

@@ -1,6 +1,4 @@
 /* ================================================================
-   globals.css — ENTRY POINT
-   Chỉ có nhiệm vụ import, KHÔNG viết CSS trực tiếp ở đây.
    Thứ tự import quan trọng: tokens → base → components → utilities
    ================================================================ */
 

@@ -1,16 +1,22 @@
-const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/api/backend/:path*',
-        destination: 'http://localhost:5218/api/:path*',
-      },
-      {
-        source: '/WeatherForecast',
-        destination: 'http://localhost:5218/WeatherForecast',
-      },
-    ]
-  },
-}
+import type { NextConfig } from 'next';
 
-export default nextConfig
+const nextConfig: NextConfig = {
+    turbopack: {
+        root: __dirname,
+    },
+
+    async rewrites() {
+        return [
+            {
+                source: '/api/backend/:path*',
+                destination: 'http://localhost:5218/api/:path*',
+            },
+            {
+                source: '/WeatherForecast',
+                destination: 'http://localhost:5218/WeatherForecast',
+            },
+        ];
+    },
+};
+
+export default nextConfig;
