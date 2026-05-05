@@ -1,0 +1,147 @@
+﻿không thực sự cần kiểm tra lỗi theo thời gian thực (real-time),
+hãy Disable extension ESLint. 
+Thay vào đó, bạn chỉ cần chạy lệnh npm run lint thủ công trong terminal khi cần kiểm tra toàn bộ project.
+
+npm run lint
+
+
+Ctrl + P: Tìm và mở file cực nhanh (không cần dùng chuột bấm vào cây thư mục, giúp giảm tải render giao diện).
+
+F12: Đi thẳng tới nơi định nghĩa hàm/biến (thay vì dùng CSS Peek hay các trình soi code).
+
+Alt + F12: Xem nhanh định nghĩa ngay tại chỗ mà không cần chuyển file.
+
+
+
+
+
+
+
+
+==========================================================================================
+Đóng vai:
+Bạn là Principal System Architect + Senior Technical Lead + Senior Business Analyst có kinh nghiệm triển khai sản phẩm thực tế quy mô production.
+
+Bối cảnh:
+Tôi đang xây dựng hệ thống KnowledgeVault Platform (quản lý tài liệu cá nhân + lưu kiến thức học tập + chia sẻ team dev).
+
+Tôi đã có tài liệu kỹ thuật trước đó, nhưng tôi đánh giá còn thiếu, chưa hợp lý hoặc có khả năng sai sót.
+
+Nhiệm vụ của bạn:
+
+1. Review toàn bộ tài liệu hiện có như đang audit nội bộ trước khi giao cho team dev triển khai.
+
+2. Tìm tất cả vấn đề:
+
+* Thiếu requirement
+* Thiếu edge case
+* Thiếu bảng dữ liệu
+* Thiếu API cần thiết
+* Sai logic nghiệp vụ
+* Thiếu security concern
+* Thiếu performance concern
+* Thiếu maintainability concern
+* Thiếu scalability concern
+* Thiếu UX flow quan trọng
+* Over-engineering
+* Under-engineering
+
+3. Sau đó regenerate lại tài liệu kỹ thuật hoàn chỉnh hơn.
+
+4. Mục tiêu:
+   Dev senior đọc xong có thể bắt đầu code mà không phải đoán.
+
+==================================================
+YÊU CẦU BẮT BUỘC
+================
+
+Hãy phân tích theo checklist sau:
+
+A. Product Completeness
+
+* Chức năng đã đủ chưa?
+* Thiếu module nào?
+
+B. Database Design
+
+* Có thiếu bảng nào?
+* Có normalize quá mức?
+* Có table dư thừa?
+* PK/FK/index hợp lý chưa?
+* Audit columns đầy đủ chưa?
+
+C. API Design
+
+* Có đủ CRUD chưa?
+* Có thiếu pagination/filter/sort/search?
+* HTTP status code đúng chưa?
+* Error response chuẩn chưa?
+
+D. Security
+
+* Auth flow đủ chưa?
+* JWT/Refresh token hợp lý chưa?
+* RBAC đủ chưa?
+* Resource permission thiếu không?
+* Rate limit / audit log / brute force protection?
+
+E. Performance
+
+* N+1 query risk?
+* Cache strategy?
+* Search strategy?
+* File storage strategy?
+* Scaling lên 100 users?
+
+F. Frontend
+
+* SSR/CSR đúng chỗ?
+* Loading state?
+* Error boundary?
+* Optimistic update?
+* Form validation?
+
+G. DevOps
+
+* Env config
+* Logging
+* Monitoring
+* Backup
+* Migration strategy
+
+H. Real-world Risks
+
+* User xoá nhầm dữ liệu
+* Upload file lớn
+* Concurrent update
+* Broken permission
+* Slow query
+
+==================================================
+OUTPUT FORMAT
+=============
+
+1. Executive Review Summary
+
+2. Những điểm thiếu / sai / rủi ro trong tài liệu cũ
+
+3. Những phần cần bổ sung bắt buộc
+
+4. Phiên bản tài liệu kỹ thuật mới hoàn chỉnh
+
+5. Roadmap triển khai thực tế (MVP → V2 → Scale)
+
+6. Top 10 lỗi dev thường gặp khi build hệ thống này
+
+7. Final Recommendation (giải pháp tốt nhất)
+
+==================================================
+QUY TẮC
+=======
+
+* Không trả lời chung chung
+* Nếu có nhiều hướng, hãy so sánh trade-off
+* Ưu tiên thực chiến production
+* Nêu rõ assumption nếu thiếu thông tin
+* Chủ động bổ sung phần tôi chưa nghĩ tới
+* Hãy phản biện như reviewer khó tính
