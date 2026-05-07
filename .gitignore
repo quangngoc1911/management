@@ -1,3 +1,7 @@
+# Loại bỏ các thư mục build của .NET
+[Bb]in/
+[Oo]bj/
+
 # ================================
 # Backend .NET
 # ================================
@@ -38,3 +42,6 @@ frontend/.env.production
 .DS_Store
 Thumbs.db
 node_modules
+
+
+technical_documents/
