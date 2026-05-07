@@ -1,134 +1,67 @@
 using System.Text;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-using ManagementSystem.Configurations;
-using ManagementSystem.Data;
-using ManagementSystem.Interfaces;
-using ManagementSystem.Mappings;
-using ManagementSystem.Middleware;
-using ManagementSystem.Repositories;
-using ManagementSystem.Services;
+using ManagementSystem.Application;
+using ManagementSystem.Infrastructure;
+using ManagementSystem.Application.Mappings;
+using ManagementSystem.Application.Middleware;
 
+using Scalar.AspNetCore;
+
+// Đảm bảo Console hiển thị được tiếng Việt có dấu khi Log thông tin
 Console.OutputEncoding = Encoding.UTF8;
 
-// Add Serilog configuration (Placeholder for now)
-// builder.Host.UseSerilog((context, configuration) =>
-//     configuration.ReadFrom.Configuration(context.Configuration));
-
 var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine(builder.Environment.EnvironmentName);
-// ===========================
-// Add services
-// ===========================
 
+// Hiển thị môi trường đang chạy (Development, Staging, hoặc Production)
+Console.WriteLine($"Môi trường hiện tại: {builder.Environment.EnvironmentName}");
+
+// ==========================================================================
+// 1. CẤU HÌNH DỊCH VỤ (DEPENDENCY INJECTION - DI)
+// ==========================================================================
+
+// Cấu hình Controllers và xử lý JSON (tránh lỗi vòng lặp và giữ nguyên định dạng ký tự)
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Encoder =
-            System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping; // ← không escape ký tự Unicode
-        options.JsonSerializerOptions.ReferenceHandler =
-            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        // Cho phép hiển thị các ký tự đặc biệt (tiếng Việt) mà không bị mã hóa thành \uXXXX
+        options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+        // Ngăn lỗi vòng lặp vô tận khi các Object tham chiếu lẫn nhau (như Category -> Product -> Category)
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
+// Đăng ký AutoMapper để tự động chuyển đổi dữ liệu giữa Entity và DTO
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-// Database
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+// ĐĂNG KÝ CÁC DỊCH VỤ HỆ THỐNG (Database, JWT, IDateTime, Repositories...)
+// Hàm này nằm trong project Infrastructure
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
+// ĐĂNG KÝ CÁC DỊCH VỤ NGHIỆP VỤ (AuthService, UserService, CategoryService...)
+// Hàm này nằm trong project Application
+builder.Services.AddApplicationServices();
+
+// Cấu hình CORS: Cho phép ứng dụng Frontend (React/Angular) truy cập vào API này
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:3000") // Địa chỉ của máy khách (Frontend)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-// Configuration
-builder.Services.Configure<JwtSettings>(
-    builder.Configuration.GetSection("JwtSettings"));
-
-var jwt = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
-var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
-    ?? builder.Configuration["JwtSettings:SecretKey"]
-    ?? throw new InvalidOperationException("JWT SecretKey chưa được cấu hình");
-
-var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
-    ?? builder.Configuration["JwtSettings:Issuer"]!;
-
-var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
-    ?? builder.Configuration["JwtSettings:Audience"]!;
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtIssuer,
-            ValidAudience = jwtAudience,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                                           Encoding.UTF8.GetBytes(jwt.SecretKey)),
-            ClockSkew = TimeSpan.Zero
-        };
-
-        // ✅ Custom thêm response lỗi cho đẹp
-        options.Events = new JwtBearerEvents
-        {
-            OnChallenge = async context =>
-            {
-                context.HandleResponse();
-                context.Response.StatusCode = 401;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    message = "Chưa đăng nhập hoặc token hết hạn"
-                });
-            },
-            OnForbidden = async context =>
-            {
-                context.Response.StatusCode = 403;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    message = "Không có quyền truy cập"
-                });
-            }
-        };
-    });
-
-// Dependency Injection
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IDocumentService, DocumentService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IMenuService, MenuService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IFileStorageService, FileStorageService>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IMenuRepository, MenuRepository>();
-builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
-
-// AutoMapper
-builder.Services.AddAutoMapper(typeof(Program));
-
-// Swagger
+// Cấu hình Swagger/OpenAPI để tạo tài liệu hướng dẫn sử dụng API tự động
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "MyAPI", Version = "v1" });
+    c.SwaggerDoc("v1", new() { Title = "Management System API", Version = "v1" });
 
-    // Thêm ô Bearer token
+    // Cấu hình để Swagger có nút "Authorize" nhập Token JWT
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -136,7 +69,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Nhập token vào đây. Ví dụ: Bearer eyJhbG..."
+        Description = "Nhập token JWT của bạn theo định dạng: Bearer {token}"
     });
 
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -155,29 +88,57 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Xây dựng ứng dụng sau khi đã đăng ký tất cả dịch vụ
 var app = builder.Build();
 
-// ===========================
-// Middleware
-// ===========================
+// ==========================================================================
+// 2. CẤU HÌNH PIPELINE (MIDDLEWARE) - Thứ tự ở đây cực kỳ quan trọng!
+// ==========================================================================
 
+// Nếu là môi trường phát triển (Development) thì hiển thị giao diện hướng dẫn API
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Tạo file JSON mô tả API
+    app.UseSwagger(options =>
+    {
+        options.RouteTemplate = "openapi/{documentName}.json";
+    });
+
+    // Cấu hình giao diện Scalar (đẹp hơn Swagger UI) để xem và test API
+    app.MapScalarApiReference("/docs", options =>
+    {
+        options.Title = "Management System API Reference";
+        options.Theme = ScalarTheme.Moon; // Giao diện tối (Dark Mode)
+        options.OpenApiRoutePattern = "/openapi/v1.json"; // Chỉ đường dẫn tới file JSON Swagger
+
+        // Cấu hình xác thực trong Scalar (dùng PreferredSecuritySchemes để tránh lỗi Obsolete)
+        options.Authentication = new ScalarAuthenticationOptions
+        {
+            PreferredSecuritySchemes = new[] { "Bearer" }
+        };
+    });
 }
 
-// Global error handler
-app.UseMiddleware<ExceptionMiddleware>(); // 1. Bắt lỗi
+// Xử lý lỗi tập trung: Mọi lỗi xảy ra trong code sẽ được bắt tại đây và trả về JSON chuẩn
+app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseHttpsRedirection(); // 2. HTTPS
+// Tự động chuyển hướng từ HTTP sang HTTPS để bảo mật
+app.UseHttpsRedirection();
 
-app.UseCors("AllowFrontend"); // 3. CORS
+// Áp dụng chính sách CORS đã cấu hình ở trên
+app.UseCors("AllowFrontend");
 
-app.UseAuthentication();  // 4. Xác thực
+// Xác thực danh tính: Kiểm tra Token gửi lên có hợp lệ hay không (Ai đang gọi API?)
+app.UseAuthentication();
 
-app.UseAuthorization();  // 5. Phân quyền
+// Kiểm tra quyền hạn: Người dùng này có được phép vào API này không? (Admin hay User?)
+app.UseAuthorization();
 
-app.MapControllers(); // 6. Route
+// Khi vào trang chủ "/" sẽ tự động nhảy sang trang tài liệu API "/docs"
+app.MapGet("/", () => Results.Redirect("/docs"));
 
+// Ánh xạ các Controller thành các con đường dẫn (Route) API thực tế
+app.MapControllers();
+
+// Bắt đầu chạy ứng dụng
 app.Run();
