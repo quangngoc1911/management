@@ -15,10 +15,19 @@ using Scalar.AspNetCore;
 Console.OutputEncoding = Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);
+// --- Cấu hình lại đường dẫn appsettings ---
+builder.Configuration.Sources.Clear(); // Xóa các đường dẫn mặc định ở root
+
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("Properties/appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables(); // Giữ lại cái này để đọc các biến môi trường (như JWT_SECRET_KEY)
+// ------------------------------------------
 
 // Hiển thị môi trường đang chạy (Development, Staging, hoặc Production)
 Console.WriteLine($"Môi trường hiện tại: {builder.Environment.EnvironmentName}");
-
+Console.WriteLine($"Database Connection: {builder.Configuration.GetConnectionString("DefaultConnection")?.Substring(0, 10)}...");
 // ==========================================================================
 // 1. CẤU HÌNH DỊCH VỤ (DEPENDENCY INJECTION - DI)
 // ==========================================================================

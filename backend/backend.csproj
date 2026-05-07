@@ -34,6 +34,12 @@
     <Compile Remove="Presentation\Controllers\**\*.cs" />
     <Compile Remove="Application\Services\AuthService.cs" />
     <Compile Remove="Application\Services\JwtService.cs" />
+    <Content Update="Properties\appsettings.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Properties\appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
