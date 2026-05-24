@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -17,6 +17,7 @@ import {
     X,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const menuItems = [
@@ -31,8 +32,24 @@ const menuItems = [
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
-    const { user, logout } = useAuth();
+    const { user, logout, isAuthenticated, authLoading } = useAuth();
+    const router = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Redirect to login when auth checked and not authenticated
+    useEffect(() => {
+        if (!authLoading && !isAuthenticated) {
+            router.replace('/login');
+        }
+    }, [authLoading, isAuthenticated, router]);
+
+    if (authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-muted">Đang kiểm tra phiên đăng nhập...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background flex">
@@ -148,3 +165,4 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
     );
 }
+

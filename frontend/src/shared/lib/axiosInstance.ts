@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5218/api';
 
 const TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -37,13 +37,22 @@ async function refreshAccessToken(
         return null;
     }
 
-    const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
-        refreshToken,
-    });
+    // Backend expects raw string body and endpoint '/auth/refresh'
+    const response = await axios.post(
+        `${API_BASE_URL}/auth/refresh`,
+        JSON.stringify(refreshToken),
+        {
+            headers: { 'Content-Type': 'application/json' },
+        },
+    );
 
     const responseData = response.data;
-    const newToken = responseData.data?.token || responseData.data?.accessToken;
-    const newRefreshToken = responseData.data?.refreshToken;
+    // Support different casing: AccessToken / accessToken / token
+    const newToken =
+        responseData?.data?.accessToken ||
+        responseData?.data?.AccessToken ||
+        responseData?.data?.token;
+    const newRefreshToken = responseData?.data?.refreshToken || responseData?.data?.RefreshToken;
 
     if (!newToken) {
         return null;

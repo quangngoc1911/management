@@ -5,7 +5,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const menuServerApi = {
   getTree: async (): Promise<Menu[]> => {
-    const token = (await cookies()).get("accessToken")?.value ?? "";
+    const token = (await cookies()).get("access_token")?.value ?? "";
 
     const res = await fetch(`${BASE_URL}/api/menus/tree`, {
       cache: "no-store",

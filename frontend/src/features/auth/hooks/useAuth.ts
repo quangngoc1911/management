@@ -1,9 +1,11 @@
 "use client";
-import { useState, useCallback, useEffect } from 'react';
-import { useRouter } from "next/navigation";
-import { LoginRequest, LoginResponse, UserInfo } from '../types/auth';
-import { authApi } from "../services/auth.client";
+
+import { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { LoginRequest, LoginResponse, UserInfo } from '../types/auth';
+import authApi from '../services/auth.client';
+import { useAuthContext } from '@/shared/lib/store/authStore';
 
 const TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -11,89 +13,68 @@ const USER_KEY = 'user';
 
 export function useAuth() {
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
+    const ctx = useAuthContext();
+    const [loginLoading, setLoginLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [user, setUser] = useState<UserInfo | null>(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-    // Check auth status on mount
-    useEffect(() => {
-        const token = localStorage.getItem(TOKEN_KEY);
-        const userStr = localStorage.getItem(USER_KEY);
-
-        if (token && userStr) {
-            try {
-                setUser(JSON.parse(userStr));
-                setIsAuthenticated(true);
-            } catch {
-                // Invalid user data
-            }
-        }
-    }, []);
 
     const login = useCallback(
         async (data: LoginRequest) => {
-            setLoading(true);
+            console.log('[useAuth] login start', data);
+            setLoginLoading(true);
             setError(null);
             try {
-                const res: LoginResponse = await authApi.login(data);
+                const res: LoginResponse = await authApi.login(data as any);
 
-                Cookies.set(TOKEN_KEY, res.token, { expires: 7 });
-                if (res.refreshToken) {
-                    Cookies.set(REFRESH_TOKEN_KEY, res.refreshToken, { expires: 30 });
+                const token = (res as any).token || (res as any).accessToken;
+                const refreshToken = (res as any).refreshToken;
+                console.log('[useAuth] login success api response', { res, token, refreshToken });
+
+                // Persist via AuthProvider helper
+                ctx.setAuth(res.user as UserInfo, token, refreshToken);
+                Cookies.set('access_token', token, { path: '/' });
+                if (refreshToken) {
+                    Cookies.set('refresh_token', refreshToken, { path: '/' });
                 }
-                localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+                console.log('[useAuth] auth state updated', { user: res.user, token, refreshToken });
 
-                setUser(res.user);
-                setIsAuthenticated(true);
-
-                const redirectTo = sessionStorage.getItem('redirect') || '/dashboard';
                 sessionStorage.removeItem('redirect');
-                router.replace(redirectTo);
+                return true;
             } catch (err: unknown) {
+                console.error('[useAuth] login error', err);
                 setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
+                return false;
             } finally {
-                setLoading(false);
+                setLoginLoading(false);
             }
         },
-        [router],
+        [ctx],
     );
 
     const logout = useCallback(async () => {
         try {
             await authApi.logout();
-            Cookies.remove(TOKEN_KEY);
-            Cookies.remove(REFRESH_TOKEN_KEY);
-            localStorage.removeItem(USER_KEY);
-            setUser(null);
-            setIsAuthenticated(false);
+            ctx.logout();
             router.push('/login');
         } catch (err: unknown) {
-            // Log or handle the error, but don't clear tokens or redirect on API failure
             console.error('Logout API failed:', err);
-        } finally {
-            setLoading(false);
         }
-    }, [router]);
+    }, [ctx, router]);
 
     const updateUser = useCallback(
         (userData: Partial<UserInfo>) => {
-            if (user) {
-                const updated = { ...user, ...userData };
-                localStorage.setItem(USER_KEY, JSON.stringify(updated));
-                setUser(updated);
-            }
+            ctx.updateUser(userData);
         },
-        [user],
+        [ctx],
     );
 
     return {
         login,
         logout,
-        loading,
+        loading: loginLoading,
+        authLoading: ctx.loading,
         error,
-        user,
-        isAuthenticated,
+        user: ctx.user,
+        isAuthenticated: ctx.isAuthenticated,
         updateUser,
     };
 }

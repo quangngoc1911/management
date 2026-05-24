@@ -1,50 +1,57 @@
 // src/features/auth/services/auth.client.ts
 
-import { LoginRequest, LoginResponse } from '../types/auth';
+import { LoginRequest, LoginResponse, UserInfo } from '../types/auth';
 import { api } from '@/shared/lib/axiosInstance';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const authApi = {
     login: async (data: LoginRequest): Promise<LoginResponse> => {
-        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
+        const res = await api.post('/auth/login', data);
+        const json = res.data;
+        console.log('[authApi.login] response:', json);
 
-        const json = await res.json();
-
-        if (!res.ok || !json.success) {
-            throw new Error(json.message || 'Đăng nhập thất bại');
+        if (!json || !json.success) {
+            throw new Error(json?.message || 'Đăng nhập thất bại');
         }
 
-        return json.data;
+        const payload = json.data;
+
+        // Map backend AuthResponse to frontend LoginResponse
+        const token = payload?.accessToken || payload?.AccessToken || payload?.token;
+        const refreshToken = payload?.refreshToken || payload?.RefreshToken;
+        const userRaw = payload?.user || payload;
+
+        if (!token) {
+            console.error('[authApi.login] missing token payload:', payload);
+            throw new Error('Không nhận được access token từ server. Vui lòng kiểm tra lại thông tin đăng nhập.');
+        }
+
+        console.log('[authApi.login] mapped login result:', { token, refreshToken, user: userRaw });
+
+        const user: UserInfo = {
+            id: userRaw?.id || userRaw?.userId || userRaw?.UserId || userRaw?.Id || '',
+            email: userRaw?.email || userRaw?.Email || '',
+            fullName:
+                userRaw?.name || userRaw?.Name || userRaw?.userName || userRaw?.UserName || '',
+            role: userRaw?.role || userRaw?.Role || '',
+            avatar: userRaw?.avatarUrl || userRaw?.AvatarUrl || userRaw?.avatar || undefined,
+        };
+
+        return { token, refreshToken, user } as LoginResponse;
     },
-
+ 
     register: async (data: { email: string; password: string; fullName: string }) => {
-        const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-
-        const json = await res.json();
-
-        if (!res.ok || !json.success) {
-            throw new Error(json.message || 'Đăng ký thất bại');
-        }
-
+        const res = await api.post('/auth/register', data);
+        const json = res.data;
+        if (!json || !json.success) throw new Error(json?.message || 'Đăng ký thất bại');
         return json.data;
     },
 
     logout: async (): Promise<void> => {
         const refreshToken = localStorage.getItem('refresh_token');
         try {
-            await api.post('/api/auth/logout', JSON.stringify(refreshToken), {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            // backend expects raw string body for logout in some implementations
+            await api.post('/auth/logout', JSON.stringify(refreshToken), {
+                headers: { 'Content-Type': 'application/json' },
             });
         } finally {
             localStorage.removeItem('access_token');
@@ -53,3 +60,5 @@ export const authApi = {
         }
     },
 };
+
+export default authApi;

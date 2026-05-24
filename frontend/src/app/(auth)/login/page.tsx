@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -18,7 +18,15 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, loading, error } = useAuth();
+  const { login, loading, error, isAuthenticated } = useAuth();
+
+  // Redirect already authenticated users away from login
+  useEffect(() => {
+      if (isAuthenticated) {
+          router.replace('/dashboard');
+      }
+  }, [isAuthenticated, router]);
+
   const [showPassword, setShowPassword] = useState(false);
   
   const {
@@ -30,7 +38,13 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-      await login(data);
+      console.log('[login page] submit', data);
+      const success = await login(data);
+      console.log('[login page] login returned', success);
+      if (success) {
+          console.log('[login page] redirecting to /dashboard');
+          router.replace('/dashboard');
+      }
   };
 
   return (
