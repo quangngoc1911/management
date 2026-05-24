@@ -10,4 +10,6 @@ public class DocumentTag : BaseEntity
 
     public Guid TagId { get; set; }
     public Tag? Tag { get; set; }
+
+    public DateTime AddedAt { get; set; }
 }

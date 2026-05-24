@@ -1,40 +1,42 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
 namespace ManagementSystem.Modules.Documents.Application.DTOs;
 
-/// <summary>
-/// DTO for creating a new document
-/// </summary>
 public class CreateDocumentDto
 {
     [Required]
     [StringLength(500, MinimumLength = 3)]
     public string Title { get; set; } = string.Empty;
 
-    [StringLength(2000)]
-    public string? Description { get; set; }
+    [Required]
+    [StringLength(500)]
+    public string Slug { get; set; } = string.Empty;
 
-    [StringLength(100)]
-    public string? DocumentNumber { get; set; }
+    [StringLength(2000)]
+    public string? Summary { get; set; }
+
+    [Required]
+    [StringLength(10)]
+    public string ContentType { get; set; } = "text";
+
+    public string? Content { get; set; }
+
+    public Guid? FileId { get; set; }
+
+    [StringLength(500)]
+    public string? ThumbnailUrl { get; set; }
 
     [Required]
     public Guid CategoryId { get; set; }
 
-    public DateTime? IssueDate { get; set; }
+    public Guid? MemberId { get; set; }
 
-    public DateTime? ExpiryDate { get; set; }
-
-    [StringLength(50)]
-    public string? Status { get; set; } = "Draft";
+    public bool IsPublished { get; set; }
+    public int SortOrder { get; set; }
 
     /// <summary>
-    /// File to upload (optional)
+    /// Optional file upload (sets FileId after upload)
     /// </summary>
     public IFormFile? File { get; set; }
-
-    /// <summary>
-    /// Additional custom fields
-    /// </summary>
-    public List<CreateDocumentFieldDto> Fields { get; set; } = new();
 }

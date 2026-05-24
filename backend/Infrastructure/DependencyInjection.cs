@@ -1,14 +1,12 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+
 using ManagementSystem.Application.Options;
 using ManagementSystem.Infrastructure.Persistence;
-using ManagementSystem.Infrastructure.Interceptors;
-using ManagementSystem.Application.Contracts;
-using ManagementSystem.Infrastructure.Services; // 1. Thêm namespace chứa Interceptor
+using ManagementSystem.Infrastructure.Interceptors; // 1. Thêm namespace chứa Interceptor
+
 
 namespace ManagementSystem.Infrastructure;
 
@@ -25,7 +23,8 @@ public static class DependencyInjection
             var auditableInterceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
 
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
-                   .AddInterceptors(auditableInterceptor); // 4. Đăng ký Interceptor vào DbContext
+                   .AddInterceptors(auditableInterceptor)
+                    .UseSnakeCaseNamingConvention(); // 4. Đăng ký Interceptor vào DbContext
         });
 
         // --- Giữ nguyên phần cấu hình JWT phía dưới ---

@@ -7,11 +7,11 @@ namespace ManagementSystem.Modules.Auth.Domain.Entities;
 public class Role : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public bool IsSystemRole { get; set; } = false;
+    public string Permissions { get; set; } = "{}";
+    public bool IsSystem { get; set; }
 
-    // Navigation properties
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
-    public ICollection<RoleMenu> RoleMenus { get; set; } = new List<RoleMenu>();
     public ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
 }

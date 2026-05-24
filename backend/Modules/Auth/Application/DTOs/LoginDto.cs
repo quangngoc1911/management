@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+using ManagementSystem.Domain.ValueObjects;
+
 namespace ManagementSystem.Modules.Auth.Application.DTOs;
 
 public class LoginDto

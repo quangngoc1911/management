@@ -11,7 +11,7 @@ public class DocumentService : IDocumentService
     private readonly IFileStorageService _fileStorageService;
     private readonly IDateTime _dateTime;
 
-    public DocumentService(IDateTime dateTime,IUnitOfWork unitOfWork, IFileStorageService fileStorageService)
+    public DocumentService(IDateTime dateTime, IUnitOfWork unitOfWork, IFileStorageService fileStorageService)
     {
         _unitOfWork = unitOfWork;
         _fileStorageService = fileStorageService;
@@ -38,40 +38,21 @@ public class DocumentService : IDocumentService
         {
             Id = Guid.NewGuid(),
             Title = dto.Title,
-            Description = dto.Description,
-            DocumentNumber = dto.DocumentNumber,
+            Slug = dto.Slug,
+            Summary = dto.Summary,
+            ContentType = dto.ContentType,
+            Content = dto.Content,
+            FileId = dto.FileId,
+            ThumbnailUrl = dto.ThumbnailUrl,
             CategoryId = dto.CategoryId,
-            IssueDate = dto.IssueDate,
-            ExpiryDate = dto.ExpiryDate,
-            Status = dto.Status ?? "Draft",
+            MemberId = dto.MemberId,
+            IsPublished = dto.IsPublished,
+            PublishedAt = dto.IsPublished ? _dateTime.UtcNow : null,
+            SortOrder = dto.SortOrder,
+            Version = 1,
             CreatedByUserId = userId,
             CreatedAt = _dateTime.UtcNow
         };
-
-        if (dto.File != null)
-        {
-            var fileResult = await _fileStorageService.UploadAsync(dto.File, "documents");
-            document.FilePath = fileResult.FilePath;
-            document.FileName = fileResult.OriginalFileName;
-            document.FileSize = fileResult.FileSize;
-            document.FileType = fileResult.ContentType;
-        }
-
-        if (dto.Fields != null)
-        {
-            foreach (var field in dto.Fields)
-            {
-                document.Fields.Add(new DocumentField
-                {
-                    Id = Guid.NewGuid(),
-                    DocumentId = document.Id,
-                    FieldName = field.FieldName,
-                    FieldValue = field.FieldValue,
-                    FieldType = field.FieldType,
-                    SortOrder = field.SortOrder
-                });
-            }
-        }
 
         await _unitOfWork.Documents.CreateAsync(document);
         await _unitOfWork.SaveChangesAsync();
@@ -87,73 +68,32 @@ public class DocumentService : IDocumentService
             return null;
 
         if (dto.Title != null) document.Title = dto.Title;
-        document.Description = dto.Description;
-        document.DocumentNumber = dto.DocumentNumber;
-        document.CategoryId = dto.CategoryId ?? document.CategoryId;
-        document.IssueDate = dto.IssueDate;
-        document.ExpiryDate = dto.ExpiryDate;
-        if (dto.Status != null) document.Status = dto.Status;
-        
-        document.UpdatedByUserId = userId;
-        document.UpdatedAt = _dateTime.UtcNow;
+        if (dto.Slug != null) document.Slug = dto.Slug;
+        if (dto.Summary != null) document.Summary = dto.Summary;
+        if (dto.ContentType != null) document.ContentType = dto.ContentType;
+        if (dto.Content != null) document.Content = dto.Content;
+        if (dto.ThumbnailUrl != null) document.ThumbnailUrl = dto.ThumbnailUrl;
+        if (dto.CategoryId.HasValue) document.CategoryId = dto.CategoryId.Value;
+        if (dto.MemberId.HasValue) document.MemberId = dto.MemberId;
+        if (dto.SortOrder.HasValue) document.SortOrder = dto.SortOrder.Value;
+
+        if (dto.IsPublished.HasValue && dto.IsPublished.Value != document.IsPublished)
+        {
+            document.IsPublished = dto.IsPublished.Value;
+            document.PublishedAt = dto.IsPublished.Value ? _dateTime.UtcNow : (DateTime?)null;
+        }
 
         if (dto.RemoveFile)
         {
-            if (!string.IsNullOrEmpty(document.FilePath))
-                await _fileStorageService.DeleteAsync(document.FilePath);
-            document.FilePath = null;
-            document.FileName = null;
-            document.FileSize = null;
-            document.FileType = null;
+            document.FileId = null;
         }
-        else if (dto.File != null)
+        else if (dto.FileId.HasValue)
         {
-            if (!string.IsNullOrEmpty(document.FilePath))
-                await _fileStorageService.DeleteAsync(document.FilePath);
-
-            var fileResult = await _fileStorageService.UploadAsync(dto.File, "documents");
-            document.FilePath = fileResult.FilePath;
-            document.FileName = fileResult.OriginalFileName;
-            document.FileSize = fileResult.FileSize;
-            document.FileType = fileResult.ContentType;
+            document.FileId = dto.FileId;
         }
 
-        if (dto.Fields != null)
-        {
-            foreach (var updateField in dto.Fields)
-            {
-                if (updateField.Id.HasValue)
-                {
-                    var existingField = document.Fields.FirstOrDefault(f => f.Id == updateField.Id.Value);
-                    if (existingField != null)
-                    {
-                        if (updateField.IsDeleted)
-                            document.Fields.Remove(existingField);
-                        else
-                        {
-                            existingField.FieldName = updateField.FieldName;
-                            existingField.FieldValue = updateField.FieldValue;
-                            existingField.FieldType = updateField.FieldType;
-                            existingField.SortOrder = updateField.SortOrder;
-                            existingField.UpdatedAt = _dateTime.UtcNow;
-                        }
-                    }
-                }
-                else if (!updateField.IsDeleted)
-                {
-                    document.Fields.Add(new DocumentField
-                    {
-                        Id = Guid.NewGuid(),
-                        DocumentId = document.Id,
-                        FieldName = updateField.FieldName,
-                        FieldValue = updateField.FieldValue,
-                        FieldType = updateField.FieldType,
-                        SortOrder = updateField.SortOrder,
-                        CreatedAt = _dateTime.UtcNow
-                    });
-                }
-            }
-        }
+        document.UpdatedAt = _dateTime.UtcNow;
+        document.Version += 1;
 
         _unitOfWork.Documents.Update(document);
         await _unitOfWork.SaveChangesAsync();
@@ -167,27 +107,17 @@ public class DocumentService : IDocumentService
         if (document == null)
             return false;
 
-        if (!string.IsNullOrEmpty(document.FilePath))
-            await _fileStorageService.DeleteAsync(document.FilePath);
-
         await _unitOfWork.Documents.DeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
 
-    public async Task<(byte[] fileBytes, string fileName, string contentType)?> DownloadFileAsync(Guid id)
+    public Task<(byte[] fileBytes, string fileName, string contentType)?> DownloadFileAsync(Guid id)
     {
-        var document = await _unitOfWork.Documents.GetEntityByIdAsync(id);
-        if (document == null || string.IsNullOrEmpty(document.FilePath))
-            return null;
-
-        var fileBytes = await _fileStorageService.DownloadAsync(document.FilePath);
-        if (fileBytes == null)
-            return null;
-
-        var contentType = document.FileType ?? "application/octet-stream";
-        return (fileBytes, document.FileName ?? "document", contentType);
+        // File download now goes through DocumentFile entity (FileId reference).
+        // Will be reimplemented when files module gets its own service.
+        return Task.FromResult<(byte[], string, string)?>(null);
     }
 
     public async Task<DashboardStatsDto> GetDashboardStatsAsync()

@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ManagementSystem.Domain.Entities;
+using ManagementSystem.Modules.Documents.Domain.Entities;
 
 namespace ManagementSystem.Infrastructure.Persistence.Configurations;
 
@@ -8,34 +8,58 @@ public class DocumentFileConfiguration : IEntityTypeConfiguration<DocumentFile>
 {
     public void Configure(EntityTypeBuilder<DocumentFile> builder)
     {
-        builder.HasKey(df => df.Id);
+        builder.ToTable("files");
 
-        builder.Property(df => df.OriginalName)
-            .IsRequired()
-            .HasMaxLength(255);
+        builder.HasKey(f => f.Id);
+        builder.Property(f => f.Id).HasColumnOrder(0);
 
-        builder.Property(df => df.StoredName)
+        builder.Property(f => f.OriginalName)
             .IsRequired()
-            .HasMaxLength(255);
+            .HasMaxLength(500)
+            .IsUnicode(true)
+            .HasColumnOrder(1);
 
-        builder.Property(df => df.StoragePath)
+        builder.Property(f => f.StoredName)
             .IsRequired()
-            .HasMaxLength(500);
+            .HasMaxLength(500)
+            .HasColumnOrder(2);
 
-        builder.Property(df => df.PublicUrl)
+        builder.Property(f => f.StoragePath)
             .IsRequired()
-            .HasMaxLength(500);
+            .HasMaxLength(1000)
+            .HasColumnOrder(3);
 
-        builder.Property(df => df.FileType)
+        builder.Property(f => f.PublicUrl)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(1000)
+            .HasColumnOrder(4);
 
-        builder.Property(df => df.MimeType)
+        builder.Property(f => f.FileType)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(20)
+            .HasColumnOrder(5);
 
-        builder.Property(df => df.StorageProvider)
+        builder.Property(f => f.MimeType)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(100)
+            .HasColumnOrder(6);
+
+        builder.Property(f => f.SizeBytes).IsRequired().HasColumnOrder(7);
+
+        builder.Property(f => f.UploadedByUserId).IsRequired().HasColumnOrder(8);
+
+        builder.Property(f => f.StorageProvider)
+            .IsRequired()
+            .HasMaxLength(20)
+            .HasDefaultValue("local")
+            .HasColumnOrder(9);
+
+        builder.Property(f => f.CreatedAt).IsRequired().HasColumnOrder(10);
+        builder.Property(f => f.IsDeleted).IsRequired().HasDefaultValue(false).HasColumnOrder(11);
+
+        builder.HasOne(f => f.UploadedByUser)
+            .WithMany()
+            .HasForeignKey(f => f.UploadedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

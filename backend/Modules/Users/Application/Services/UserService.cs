@@ -125,11 +125,10 @@ public class UserService : IUserService
 
         var user = _mapper.Map<User>(request);
 
-        user.Name = StringHelper.NormalizeWhitespace(request.Name);
+        user.UserName = StringHelper.NormalizeWhitespace(request.Name);
         user.Email = email;
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        user.Role = request.Role ?? "Viewer";
-        user.IsActive = true;
+        user.Status = ManagementSystem.Domain.Enums.EntityStatus.Active;
         user.CreatedAt = _dateTime.UtcNow;
 
         await _repo.CreateAsync(user);

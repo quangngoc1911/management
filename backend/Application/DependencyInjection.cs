@@ -1,12 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
-
 using ManagementSystem.Application.Contracts;
+using ManagementSystem.Application.Services;
+
 using ManagementSystem.Modules.Auth.Application;
 using ManagementSystem.Modules.Categories.Application;
 using ManagementSystem.Modules.Documents.Application;
-using ManagementSystem.Modules.Menus.Application;
 using ManagementSystem.Modules.Users.Application;
-using ManagementSystem.Application.Services;
+
 using ManagementSystem.Infrastructure.Repositories;
 using ManagementSystem.Infrastructure.Services;
 
@@ -19,12 +18,12 @@ public static class DependencyInjection
         services.AddAuthModule();
         services.AddCategoriesModule();
         services.AddDocumentsModule();
-        services.AddMenusModule();
         services.AddUsersModule();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddSingleton<IDateTime, DateTimeService>();
         services.AddScoped<IFileStorageService, FileStorageService>();
+
+        services.AddSingleton<IDateTime, DateTimeService>();
 
         return services;
     }

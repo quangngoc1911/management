@@ -2,30 +2,38 @@ using System;
 using System.Collections.Generic;
 using ManagementSystem.Domain.Entities;
 using ManagementSystem.Modules.Documents.Domain.Entities;
-using ManagementSystem.Modules.Auth.Domain.Entities;
 
 namespace ManagementSystem.Modules.Auth.Domain.Entities;
 
 public class User : BaseEntity
 {
-    public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string? UserName { get; set; }
+    public string? NormalizedUserName { get; set; }
     public string PasswordHash { get; set; } = string.Empty;
-    public string Role { get; set; } = "Viewer"; // Temporary for compatibility
-
+    public string? Phone { get; set; }
+    public string? NormalizedPhone { get; set; }
     public string? AvatarUrl { get; set; }
-    public string? Department { get; set; }
-    public bool IsActive { get; set; } = true;
+    public DateTime? EmailVerifiedAt { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public string? TwoFactorSecret { get; set; }
     public DateTime? LastLoginAt { get; set; }
+    public short FailedLoginCount { get; set; }
+    public DateTime? LockedUntil { get; set; }
+    public DateTime? PasswordChangedAt { get; set; }
 
-    // Navigation properties
+    // Auth navigations
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
+    public ICollection<PasswordHistory> PasswordHistories { get; set; } = new List<PasswordHistory>();
+    public ICollection<LoginAttempt> LoginAttempts { get; set; } = new List<LoginAttempt>();
+    public ICollection<SecurityLog> SecurityLogs { get; set; } = new List<SecurityLog>();
+
+    // Documents navigations
     public ICollection<Document> CreatedDocuments { get; set; } = new List<Document>();
     public ICollection<DocumentVersion> EditedVersions { get; set; } = new List<DocumentVersion>();
-    public ICollection<Attachment> UploadedFiles { get; set; } = new List<Attachment>();
-    public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
-    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
-    public ICollection<DocumentShare> SharedDocuments { get; set; } = new List<DocumentShare>();
-    public ICollection<DocumentShare> ReceivedShares { get; set; } = new List<DocumentShare>();
+
+    // System navigations
     public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 }

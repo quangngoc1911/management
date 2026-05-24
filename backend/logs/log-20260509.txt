@@ -1,0 +1,48 @@
+2026-05-09 04:34:54.626 +07:00 [INF] Starting web host
+2026-05-09 04:35:05.669 +07:00 [INF] User profile is available. Using 'C:\Users\pc\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-05-09 04:35:06.300 +07:00 [INF] Now listening on: http://localhost:5218
+2026-05-09 04:35:06.325 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-05-09 04:35:06.327 +07:00 [INF] Hosting environment: Development
+2026-05-09 04:35:06.327 +07:00 [INF] Content root path: D:\1_HOC_TAP\TU_HOC\CODE_CN\management\backend
+2026-05-09 04:37:05.595 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5218/ - null null
+2026-05-09 04:37:05.625 +07:00 [WRN] Failed to determine the https port for redirect.
+2026-05-09 04:37:07.281 +07:00 [INF] Executing endpoint 'HTTP: GET /'
+2026-05-09 04:37:07.295 +07:00 [INF] Executing RedirectResult, redirecting to /docs.
+2026-05-09 04:37:07.296 +07:00 [INF] Executed endpoint 'HTTP: GET /'
+2026-05-09 04:37:07.297 +07:00 [INF] HTTP GET / responded 302 in 1683.5266 ms
+2026-05-09 04:37:07.316 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5218/ - 302 0 null 1722.0303ms
+2026-05-09 04:37:07.321 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5218/docs - null null
+2026-05-09 04:37:07.356 +07:00 [INF] Executing endpoint 'HTTP: GET /docs/{documentName?}'
+2026-05-09 04:37:07.362 +07:00 [INF] Executing RedirectResult, redirecting to docs/.
+2026-05-09 04:37:07.363 +07:00 [INF] Executed endpoint 'HTTP: GET /docs/{documentName?}'
+2026-05-09 04:37:07.363 +07:00 [INF] HTTP GET /docs responded 302 in 40.1269 ms
+2026-05-09 04:37:07.363 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5218/docs - 302 0 null 42.35ms
+2026-05-09 04:37:07.366 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5218/docs/ - null null
+2026-05-09 04:37:07.369 +07:00 [INF] Executing endpoint 'HTTP: GET /docs/{documentName?}'
+2026-05-09 04:37:07.489 +07:00 [INF] Write content with HTTP Response ContentType of text/html
+2026-05-09 04:37:07.490 +07:00 [INF] Executed endpoint 'HTTP: GET /docs/{documentName?}'
+2026-05-09 04:37:07.490 +07:00 [INF] HTTP GET /docs/ responded 200 in 123.2274 ms
+2026-05-09 04:37:07.490 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5218/docs/ - 200 702 text/html 124.0041ms
+2026-05-09 04:37:07.497 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5218/docs/scalar.js - null null
+2026-05-09 04:37:07.497 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5218/docs/scalar.aspnetcore.js - null null
+2026-05-09 04:37:07.498 +07:00 [INF] Executing endpoint 'HTTP: GET /docs/scalar.js'
+2026-05-09 04:37:07.499 +07:00 [INF] CORS policy execution failed.
+2026-05-09 04:37:07.499 +07:00 [INF] Request origin http://localhost:5218 does not have permission to access the resource.
+2026-05-09 04:37:07.502 +07:00 [INF] Executing endpoint 'HTTP: GET /docs/scalar.aspnetcore.js'
+2026-05-09 04:37:07.533 +07:00 [INF] Sending file with download name ''.
+2026-05-09 04:37:07.533 +07:00 [INF] Sending file with download name ''.
+2026-05-09 04:37:07.538 +07:00 [INF] Executed endpoint 'HTTP: GET /docs/scalar.aspnetcore.js'
+2026-05-09 04:37:07.538 +07:00 [INF] HTTP GET /docs/scalar.aspnetcore.js responded 200 in 40.4639 ms
+2026-05-09 04:37:07.538 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5218/docs/scalar.aspnetcore.js - 200 1111 text/javascript 40.9077ms
+2026-05-09 04:37:07.558 +07:00 [INF] Executed endpoint 'HTTP: GET /docs/scalar.js'
+2026-05-09 04:37:07.559 +07:00 [INF] HTTP GET /docs/scalar.js responded 200 in 61.4813 ms
+2026-05-09 04:37:07.560 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5218/docs/scalar.js - 200 1046400 text/javascript 62.7589ms
+2026-05-09 04:37:07.842 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5218/openapi/v1.json - null null
+2026-05-09 04:37:08.001 +07:00 [INF] HTTP GET /openapi/v1.json responded 200 in 158.8431 ms
+2026-05-09 04:37:08.002 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5218/openapi/v1.json - 200 null application/json;charset=utf-8 160.1862ms
+2026-05-09 04:37:08.649 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5218/docs/favicon.svg - null null
+2026-05-09 04:37:08.650 +07:00 [INF] Executing endpoint 'HTTP: GET /docs/favicon.svg'
+2026-05-09 04:37:08.651 +07:00 [INF] Sending file with download name ''.
+2026-05-09 04:37:08.651 +07:00 [INF] Executed endpoint 'HTTP: GET /docs/favicon.svg'
+2026-05-09 04:37:08.651 +07:00 [INF] HTTP GET /docs/favicon.svg responded 200 in 0.8260 ms
+2026-05-09 04:37:08.651 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5218/docs/favicon.svg - 200 533 image/svg+xml 2.0309ms

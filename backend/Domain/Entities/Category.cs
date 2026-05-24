@@ -13,11 +13,9 @@ public class Category : BaseEntity
     public string? Icon { get; set; }
     public string? CoverImageUrl { get; set; }
     public Guid? ParentId { get; set; }
-    public int SortOrder { get; set; }
-    public bool IsActive { get; set; }
-    public int DocumentCount { get; set; }
-
     public Category? Parent { get; set; }
+    public int SortOrder { get; set; }
+    public new bool IsActive { get; set; } = true;
 
     public ICollection<Category> Children { get; set; } = new List<Category>();
     public ICollection<Document> Documents { get; set; } = new List<Document>();

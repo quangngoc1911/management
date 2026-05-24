@@ -30,8 +30,6 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<ApiResponseDto<AuthResponse>>> Login([FromBody] LoginDto request)
     {
-        Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("123456"));
-
         try
         {
             var result = await _authService.LoginAsync(request);

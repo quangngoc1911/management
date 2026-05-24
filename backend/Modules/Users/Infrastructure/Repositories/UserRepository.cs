@@ -23,7 +23,7 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .AsNoTracking()
             .Where(u => !u.IsDeleted)
-            .OrderBy(u => u.Name)
+            .OrderBy(u => u.UserName)
             .ToListAsync();
     }
 
@@ -66,7 +66,7 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .AsNoTracking()
             .Where(u => !u.IsDeleted)
-            .OrderBy(u => u.Name)
+            .OrderBy(u => u.UserName)
             .Skip(skip)
             .Take(take)
             .ToListAsync();

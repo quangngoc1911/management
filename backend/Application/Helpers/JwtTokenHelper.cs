@@ -20,8 +20,7 @@ public static class JwtTokenHelper
         var claims = new[]
         {
             new Claim("userId", user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
         };
         var token = new JwtSecurityToken(
             issuer: issuer,

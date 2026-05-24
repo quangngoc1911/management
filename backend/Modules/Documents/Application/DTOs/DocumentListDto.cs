@@ -1,26 +1,26 @@
-﻿namespace ManagementSystem.Modules.Documents.Application.DTOs;
+namespace ManagementSystem.Modules.Documents.Application.DTOs;
 
-/// <summary>
-/// Document list item for grid display
-/// </summary>
 public class DocumentListDto
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string? Description { get; set; }
-    public string? DocumentNumber { get; set; }
+    public string Slug { get; set; } = string.Empty;
+    public string? Summary { get; set; }
+    public string ContentType { get; set; } = "text";
+    public string? ThumbnailUrl { get; set; }
+
     public Guid CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
-    public DateTime? IssueDate { get; set; }
-    public DateTime? ExpiryDate { get; set; }
-    public string? Status { get; set; }
-    public string? FilePath { get; set; }
-    public string? FileName { get; set; }
-    public long? FileSize { get; set; }
-    public string? FileType { get; set; }
+
+    public Guid? MemberId { get; set; }
+
     public Guid CreatedByUserId { get; set; }
     public string CreatedByUserName { get; set; } = string.Empty;
+
+    public bool IsPublished { get; set; }
+    public DateTime? PublishedAt { get; set; }
+    public int ViewCount { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    public List<DocumentFieldDto> Fields { get; set; } = new();
 }

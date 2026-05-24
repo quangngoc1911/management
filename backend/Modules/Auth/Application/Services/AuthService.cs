@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using ManagementSystem.Application.Options;
 using ManagementSystem.Infrastructure.Persistence;
 using ManagementSystem.Modules.Auth.Application.DTOs;
+using ManagementSystem.Modules.Auth.Domain.Entities;
 using ManagementSystem.Modules.Users.Application.DTOs;
 using ManagementSystem.Domain.Entities;
 using ManagementSystem.Application.Contracts;
@@ -53,21 +54,34 @@ public class AuthService : IAuthService
             UserId = user.Id,
             TokenHash = BCrypt.Net.BCrypt.HashPassword(refreshToken),
             ExpiresAt = _dateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays),
-            DeviceInfo = "web",
             CreatedAt = _dateTime.UtcNow
         });
         await _context.SaveChangesAsync();
 
+        var accessTokenExpiresAt = _dateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes);
+        var refreshTokenExpiresAt = _dateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays);
+
         return new AuthResponse
         {
+            UserId = user.Id,
+            UserName = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            Role = string.Empty,
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            AccessTokenExpiresAt = _dateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
+            AccessTokenExpiresAt = accessTokenExpiresAt,
+            RefreshTokenExpiresAt = refreshTokenExpiresAt,
             User = new UserDto
             {
                 Id = user.Id,
-                Email = user.Email,
-                Role = user.Role
+                Name = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                Role = string.Empty,
+                AvatarUrl = user.AvatarUrl,
+                IsActive = user.IsActive,
+                LastLoginAt = user.LastLoginAt,
+                CreatedAt = user.CreatedAt ?? _dateTime.UtcNow,
+                UpdatedAt = user.UpdatedAt
             }
         };
     }
@@ -76,7 +90,7 @@ public class AuthService : IAuthService
     {
         var tokens = await _context.RefreshTokens
             .Include(t => t.User)
-            .Where(t => t.ExpiresAt > DateTime.UtcNow && !t.IsRevoked)
+            .Where(t => t.ExpiresAt > _dateTime.UtcNow && t.RevokedAt == null)
             .ToListAsync();
 
         var stored = tokens.FirstOrDefault(t =>
@@ -90,7 +104,7 @@ public class AuthService : IAuthService
         var newAccessToken = _jwtService.GenerateAccessToken(user);
         var newRefreshToken = _jwtService.GenerateRefreshToken();
 
-        stored.IsRevoked = true;
+        stored.RevokedAt = _dateTime.UtcNow;
 
         _context.RefreshTokens.Add(new RefreshToken
         {
@@ -102,16 +116,30 @@ public class AuthService : IAuthService
 
         await _context.SaveChangesAsync();
 
+        var accessTokenExpiresAt = _dateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes);
+        var refreshTokenExpiresAt = _dateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays);
+
         return new AuthResponse
         {
+            UserId = user.Id,
+            UserName = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            Role = string.Empty,
             AccessToken = newAccessToken,
             RefreshToken = newRefreshToken,
-            AccessTokenExpiresAt = _dateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
+            AccessTokenExpiresAt = accessTokenExpiresAt,
+            RefreshTokenExpiresAt = refreshTokenExpiresAt,
             User = new UserDto
             {
                 Id = user.Id,
-                Email = user.Email,
-                Role = user.Role
+                Name = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                Role = string.Empty,
+                AvatarUrl = user.AvatarUrl,
+                IsActive = user.IsActive,
+                LastLoginAt = user.LastLoginAt,
+                CreatedAt = user.CreatedAt ?? _dateTime.UtcNow,
+                UpdatedAt = user.UpdatedAt
             }
         };
     }
@@ -124,7 +152,7 @@ public class AuthService : IAuthService
         }
 
         var tokens = await _context.RefreshTokens
-            .Where(t => !t.IsRevoked)
+            .Where(t => t.RevokedAt == null)
             .ToListAsync();
 
         var stored = tokens.FirstOrDefault(t =>
@@ -132,7 +160,7 @@ public class AuthService : IAuthService
 
         if (stored != null)
         {
-            stored.IsRevoked = true;
+            stored.RevokedAt = _dateTime.UtcNow;
             await _context.SaveChangesAsync();
         }
     }

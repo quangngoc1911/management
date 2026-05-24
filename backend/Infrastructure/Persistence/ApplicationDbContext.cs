@@ -5,65 +5,105 @@ using Microsoft.EntityFrameworkCore;
 
 using ManagementSystem.Domain.Entities;
 using ManagementSystem.Modules.Auth.Domain.Entities;
-using ManagementSystem.Modules.Menus.Domain.Entities;
 using ManagementSystem.Modules.Categories.Domain.Entities;
 using ManagementSystem.Modules.Documents.Domain.Entities;
+using ManagementSystem.Modules.Family.Domain.Entities;
+using ManagementSystem.Modules.Finance.Domain.Entities;
+using ManagementSystem.Modules.Medical.Domain.Entities;
+using ManagementSystem.Modules.Education.Domain.Entities;
+using ManagementSystem.Modules.Events.Domain.Entities;
+using ManagementSystem.Modules.Assets.Domain.Entities;
+using ManagementSystem.Modules.Utility.Domain.Entities;
 using ManagementSystem.Infrastructure.Persistence.Configurations;
 
 namespace ManagementSystem.Infrastructure.Persistence;
 
 public class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+    private readonly IConfiguration _configuration;
 
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IConfiguration configuration)
+        : base(options)
+    {
+        _configuration = configuration;
+    }
+
+    // Auth module
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
-    public DbSet<Menu> Menus => Set<Menu>();
-    public DbSet<RoleMenu> RoleMenus => Set<RoleMenu>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
+    public DbSet<PasswordHistory> PasswordHistories => Set<PasswordHistory>();
+    public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
+    public DbSet<SecurityLog> SecurityLogs => Set<SecurityLog>();
+
+    // Family module
+    public DbSet<FamilyMember> FamilyMembers => Set<FamilyMember>();
+    public DbSet<MemberProfile> MemberProfiles => Set<MemberProfile>();
+    public DbSet<MemberRelationship> MemberRelationships => Set<MemberRelationship>();
+
+    // Documents module
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Document> Documents => Set<Document>();
-    public DbSet<DocumentField> DocumentFields => Set<DocumentField>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<DocumentTag> DocumentTags => Set<DocumentTag>();
     public DbSet<DocumentVersion> DocumentVersions => Set<DocumentVersion>();
-    public DbSet<Attachment> Attachments => Set<Attachment>();
-    public DbSet<Comment> Comments => Set<Comment>();
-    public DbSet<DocumentShare> DocumentShares => Set<DocumentShare>();
-    public DbSet<Favorite> Favorites => Set<Favorite>();
-    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
-    public DbSet<Setting> Settings => Set<Setting>();
-    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
-    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
-    public DbSet<ViewHistory> ViewHistories => Set<ViewHistory>();
     public DbSet<DocumentFile> Files => Set<DocumentFile>();
+
+    // Finance module
+    public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<Budget> Budgets => Set<Budget>();
+    public DbSet<Investment> Investments => Set<Investment>();
+    public DbSet<RecurringTransaction> RecurringTransactions => Set<RecurringTransaction>();
+
+    // Medical module
+    public DbSet<MedicalRecord> MedicalRecords => Set<MedicalRecord>();
+    public DbSet<Medication> Medications => Set<Medication>();
+    public DbSet<HealthMetric> HealthMetrics => Set<HealthMetric>();
+
+    // Education module
+    public DbSet<EducationRecord> EducationRecords => Set<EducationRecord>();
+    public DbSet<StudySchedule> StudySchedules => Set<StudySchedule>();
+
+    // Events module
+    public DbSet<FamilyEvent> FamilyEvents => Set<FamilyEvent>();
+    public DbSet<EventMedia> EventMedia => Set<EventMedia>();
+
+    // Assets module
+    public DbSet<Asset> Assets => Set<Asset>();
+    public DbSet<AssetValuation> AssetValuations => Set<AssetValuation>();
+
+    // Utility module
+    public DbSet<Reminder> Reminders => Set<Reminder>();
     public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
+    public DbSet<ViewHistory> ViewHistories => Set<ViewHistory>();
+
+    // System module
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<SystemConfig> SystemConfigs => Set<SystemConfig>();
-    public DbSet<DocumentComment> DocumentComments => Set<DocumentComment>();
+    public DbSet<BackupLog> BackupLogs => Set<BackupLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Global Soft Delete Filter
+        ConfigureEntities(modelBuilder);
         ConfigureGlobalSoftDeleteFilter(modelBuilder);
 
-        // Entities Configurations
-        ConfigureEntities(modelBuilder);
-        // ✅ Thêm: Convert tên bảng và cột sang snake_case
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
-            // Users → users, DocumentTags → document_tags
             entity.SetTableName(ToSnakeCase(entity.GetTableName()!));
 
-            // PasswordHash → password_hash, CreatedAt → created_at
             foreach (var property in entity.GetProperties())
             {
                 property.SetColumnName(ToSnakeCase(property.GetColumnName()));
             }
 
-            // Foreign key columns
             foreach (var key in entity.GetForeignKeys())
             {
                 key.SetConstraintName(ToSnakeCase(key.GetConstraintName()!));
@@ -73,31 +113,65 @@ public class ApplicationDbContext : DbContext
 
     private void ConfigureEntities(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new UserConfiguration());
+        // Auth
+        modelBuilder.ApplyConfiguration(new UserConfiguration(_configuration));
         modelBuilder.ApplyConfiguration(new RoleConfiguration());
         modelBuilder.ApplyConfiguration(new PermissionConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
-        modelBuilder.ApplyConfiguration(new MenuConfiguration());
-        modelBuilder.ApplyConfiguration(new RoleMenuConfiguration());
+        modelBuilder.ApplyConfiguration(new RolePermissionConfiguration());
+        modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+        modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
+        modelBuilder.ApplyConfiguration(new PasswordHistoryConfiguration());
+        modelBuilder.ApplyConfiguration(new LoginAttemptConfiguration());
+        modelBuilder.ApplyConfiguration(new SecurityLogConfiguration());
+
+        // Family
+        modelBuilder.ApplyConfiguration(new FamilyMemberConfiguration());
+        modelBuilder.ApplyConfiguration(new MemberProfileConfiguration(_configuration));
+        modelBuilder.ApplyConfiguration(new MemberRelationshipConfiguration());
+
+        // Documents
         modelBuilder.ApplyConfiguration(new CategoryConfiguration());
         modelBuilder.ApplyConfiguration(new DocumentConfiguration());
-        modelBuilder.ApplyConfiguration(new DocumentFieldConfiguration());
         modelBuilder.ApplyConfiguration(new TagConfiguration());
         modelBuilder.ApplyConfiguration(new DocumentTagConfiguration());
         modelBuilder.ApplyConfiguration(new DocumentVersionConfiguration());
-        modelBuilder.ApplyConfiguration(new AttachmentConfiguration());
-        modelBuilder.ApplyConfiguration(new CommentConfiguration());
-        modelBuilder.ApplyConfiguration(new DocumentShareConfiguration());
-        modelBuilder.ApplyConfiguration(new FavoriteConfiguration());
-        modelBuilder.ApplyConfiguration(new AuditLogConfiguration());
-        modelBuilder.ApplyConfiguration(new SettingConfiguration());
-        modelBuilder.ApplyConfiguration(new RolePermissionConfiguration());
-        modelBuilder.ApplyConfiguration(new BookmarkConfiguration());
         modelBuilder.ApplyConfiguration(new DocumentFileConfiguration());
+
+        // Finance
+        modelBuilder.ApplyConfiguration(new AccountConfiguration(_configuration));
+        modelBuilder.ApplyConfiguration(new TransactionConfiguration());
+        modelBuilder.ApplyConfiguration(new BudgetConfiguration());
+        modelBuilder.ApplyConfiguration(new InvestmentConfiguration());
+        modelBuilder.ApplyConfiguration(new RecurringTransactionConfiguration());
+
+        // Medical
+        modelBuilder.ApplyConfiguration(new MedicalRecordConfiguration());
+        modelBuilder.ApplyConfiguration(new MedicationConfiguration());
+        modelBuilder.ApplyConfiguration(new HealthMetricConfiguration());
+
+        // Education
+        modelBuilder.ApplyConfiguration(new EducationRecordConfiguration());
+        modelBuilder.ApplyConfiguration(new StudyScheduleConfiguration());
+
+        // Events
+        modelBuilder.ApplyConfiguration(new FamilyEventConfiguration());
+        modelBuilder.ApplyConfiguration(new EventMediaConfiguration());
+
+        // Assets
+        modelBuilder.ApplyConfiguration(new AssetConfiguration());
+        modelBuilder.ApplyConfiguration(new AssetValuationConfiguration());
+
+        // Utility
+        modelBuilder.ApplyConfiguration(new ReminderConfiguration());
+        modelBuilder.ApplyConfiguration(new BookmarkConfiguration());
         modelBuilder.ApplyConfiguration(new ViewHistoryConfiguration());
-        modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+
+        // System
+        modelBuilder.ApplyConfiguration(new NotificationConfiguration());
+        modelBuilder.ApplyConfiguration(new AuditLogConfiguration());
         modelBuilder.ApplyConfiguration(new SystemConfigConfiguration());
-        modelBuilder.ApplyConfiguration(new DocumentCommentConfiguration());
+        modelBuilder.ApplyConfiguration(new BackupLogConfiguration());
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -144,6 +218,10 @@ public class ApplicationDbContext : DbContext
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (!typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+                continue;
+
+            var isDeletedProp = entityType.FindProperty(nameof(BaseEntity.IsDeleted));
+            if (isDeletedProp == null)
                 continue;
 
             var parameter = Expression.Parameter(entityType.ClrType, "e");

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ManagementSystem.Domain.Entities;
 
@@ -9,19 +9,21 @@ public class SystemConfigConfiguration : IEntityTypeConfiguration<SystemConfig>
     public void Configure(EntityTypeBuilder<SystemConfig> builder)
     {
         builder.HasKey(sc => sc.Id);
+        builder.Property(sc => sc.Id).HasColumnOrder(0);
 
-        builder.Property(sc => sc.Key)
-            .IsRequired()
-            .HasMaxLength(100);
+        builder.HasIndex(sc => sc.Key).IsUnique();
+        builder.Property(sc => sc.Key).IsRequired().HasMaxLength(255).HasColumnOrder(1);
 
         builder.Property(sc => sc.Value)
             .IsRequired()
-            .HasMaxLength(1000);
+            .HasColumnType("jsonb")
+            .HasColumnOrder(2);
 
-        builder.Property(sc => sc.Description)
-            .HasMaxLength(500);
+        builder.Property(sc => sc.Description).HasColumnType("text").HasColumnOrder(3);
 
-        builder.Property(sc => sc.Group)
-            .HasMaxLength(100);
+        builder.Property(sc => sc.IsEncrypted).IsRequired().HasDefaultValue(false).HasColumnOrder(4);
+        builder.Property(sc => sc.IsPublic).IsRequired().HasDefaultValue(false).HasColumnOrder(5);
+
+        builder.Property(sc => sc.CreatedAt).IsRequired().HasColumnOrder(6);
     }
 }
