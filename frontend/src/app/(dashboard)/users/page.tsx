@@ -1,367 +1,184 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Plus, Edit, Trash2, Search, Loader2 } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
+import { userService } from '@/shared/lib/services/userService';
+import type { User } from '@/features/users/types/user';
 import {
-    userService,
-    User,
-    CreateUserRequest,
-    UpdateUserRequest,
-} from '@/shared/lib/services/userService';
-import { DataTable, PaginatedTable } from '@/components/DataTable';
+    buildUserSchema,
+    emptyUserForm,
+    toCreateUser,
+    toUpdateUser,
+    type UserFormValues,
+} from '@/features/users/utils/userForm';
+import { useUserColumns } from '@/features/users/utils/useUserColumns';
+import { UserFormFields } from '@/features/users/components/UserFormFields';
+import { PaginatedTable } from '@/components/DataTable';
 import { Modal, ConfirmModal } from '@/components/Modal';
 import { PageLoading } from '@/components/LoadingSpinner';
-
-const userSchema = z.object({
-    email: z.string().email('Email không hợp lệ'),
-    fullName: z.string().min(2, 'Họ tên phải có ít nhất 2 ký tự'),
-    role: z.string().min(1, 'Vui lòng chọn vai trò'),
-});
-
-const createSchema = userSchema.extend({
-    password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-});
-
-type UserFormData = z.infer<typeof userSchema>;
-type CreateFormData = z.infer<typeof createSchema>;
-
-const columns = [
-    { key: 'fullName', header: 'Họ tên', accessor: 'fullName' as keyof User },
-    { key: 'email', header: 'Email', accessor: 'email' as keyof User },
-    { key: 'role', header: 'Vai trò', accessor: 'role' as keyof User },
-    { key: 'isActive', header: 'Trạng thái', accessor: 'isActive' as keyof User },
-    { key: 'actions', header: 'Thao tác', accessor: 'actions' as keyof User },
-];
-
-const roleOptions = [
-    { value: 'admin', label: 'Quản trị viên' },
-    { value: 'editor', label: 'Biên tập viên' },
-    { value: 'user', label: 'Người dùng' },
-];
+import { PageHeader } from '@/components/PageHeader';
+import { SearchInput } from '@/components/SearchInput';
+import { ErrorBanner } from '@/components/ErrorBanner';
+import { usePaginatedList } from '@/shared/hooks/usePaginatedList';
+import { useToast } from '@/shared/hooks/useToast';
+import { useTranslation } from '@/shared/i18n/useTranslation';
 
 export default function UsersPage() {
-    const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [pageSize] = useState(10);
-    const [total, setTotal] = useState(0);
+    const { t } = useTranslation('users');
+    const { t: tc } = useTranslation('common');
+    const toast = useToast();
+
+    const list = usePaginatedList<User>({
+        fetcher: userService.getAll,
+        pageSize: 10,
+        errorMessage: tc('error.load'),
+    });
 
     const [modalOpen, setModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selected, setSelected] = useState<User | null>(null);
     const [submitting, setSubmitting] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const isEdit = !!selected;
 
+    const schema = useMemo(() => buildUserSchema(t, isEdit), [t, isEdit]);
     const {
         register,
         handleSubmit,
         reset,
         formState: { errors },
-    } = useForm<UserFormData>();
-    const {
-        register: registerCreate,
-        handleSubmit: handleCreateSubmit,
-        reset: resetCreate,
-        formState: { errors: errorsCreate },
-    } = useForm<CreateFormData>();
+    } = useForm<UserFormValues>({ resolver: zodResolver(schema), defaultValues: emptyUserForm });
 
-    const fetchUsers = async () => {
-        setLoading(true);
-        try {
-            const data = await userService.getUsers(page, pageSize);
-            setUsers(data.items);
-            setTotal(data.total);
-        } catch (error) {
-            // Mock data
-            setUsers([
-                {
-                    id: '1',
-                    email: 'admin@example.com',
-                    fullName: 'Admin User',
-                    role: 'admin',
-                    isActive: true,
-                    createdAt: '2024-01-01',
-                    updatedAt: '2024-01-01',
-                },
-                {
-                    id: '2',
-                    email: 'editor@example.com',
-                    fullName: 'Editor User',
-                    role: 'editor',
-                    isActive: true,
-                    createdAt: '2024-01-02',
-                    updatedAt: '2024-01-02',
-                },
-                {
-                    id: '3',
-                    email: 'user@example.com',
-                    fullName: 'Regular User',
-                    role: 'user',
-                    isActive: false,
-                    createdAt: '2024-01-03',
-                    updatedAt: '2024-01-03',
-                },
-            ]);
-            setTotal(3);
-        } finally {
-            setLoading(false);
-        }
+    const openCreateModal = () => {
+        setSelected(null);
+        reset(emptyUserForm);
+        setModalOpen(true);
     };
 
-    useEffect(() => {
-        fetchUsers();
-    }, [page]);
-
-    const handleCreate = async (data: CreateFormData) => {
-        setSubmitting(true);
-        try {
-            await userService.createUser(data);
-            setModalOpen(false);
-            resetCreate();
-            fetchUsers();
-        } catch (error) {
-            console.error('Create user error:', error);
-        } finally {
-            setSubmitting(false);
-        }
+    const openEditModal = (user: User) => {
+        setSelected(user);
+        reset({ fullName: user.fullName, email: user.email, role: user.role, password: '' });
+        setModalOpen(true);
     };
 
-    const handleUpdate = async (data: UserFormData) => {
-        if (!selectedUser) return;
+    const openDeleteModal = (user: User) => {
+        setSelected(user);
+        setDeleteModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalOpen(false);
+        setSelected(null);
+    };
+
+    const columns = useUserColumns({ onEdit: openEditModal, onDelete: openDeleteModal });
+
+    const onSubmit = async (values: UserFormValues) => {
         setSubmitting(true);
         try {
-            await userService.updateUser(selectedUser.id, data);
-            setModalOpen(false);
-            setSelectedUser(null);
-            reset();
-            fetchUsers();
-        } catch (error) {
-            console.error('Update user error:', error);
+            if (selected) {
+                await userService.update(selected.id, toUpdateUser(values));
+                toast.success(t('toast.updated'));
+            } else {
+                await userService.create(toCreateUser(values));
+                toast.success(t('toast.created'));
+            }
+            closeModal();
+            await list.reload();
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : tc('error.save'));
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async () => {
-        if (!selectedUser) return;
+        if (!selected) return;
         setSubmitting(true);
         try {
-            await userService.deleteUser(selectedUser.id);
+            await userService.remove(selected.id);
+            toast.success(t('toast.deleted'));
             setDeleteModalOpen(false);
-            setSelectedUser(null);
-            fetchUsers();
-        } catch (error) {
-            console.error('Delete user error:', error);
+            setSelected(null);
+            await list.reload();
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : tc('error.delete'));
         } finally {
             setSubmitting(false);
         }
     };
 
-    const openCreateModal = () => {
-        setSelectedUser(null);
-        reset();
-        resetCreate();
-        setModalOpen(true);
-    };
-
-    const openEditModal = (user: User) => {
-        setSelectedUser(user);
-        reset({ fullName: user.fullName, email: user.email, role: user.role });
-        setModalOpen(true);
-    };
-
-    const openDeleteModal = (user: User) => {
-        setSelectedUser(user);
-        setDeleteModalOpen(true);
-    };
-
-    const tableData = users.map((user) => ({
-        ...user,
-        actions: (
-            <div className="flex items-center gap-2">
-                <button
-                    onClick={() => openEditModal(user)}
-                    className="p-1.5 text-muted hover:text-primary hover:bg-surface-alt rounded transition"
-                    title="Sửa"
-                >
-                    <Edit className="w-4 h-4" />
-                </button>
-                <button
-                    onClick={() => openDeleteModal(user)}
-                    className="p-1.5 text-muted hover:text-danger hover:bg-surface-alt rounded transition"
-                    title="Xóa"
-                >
-                    <Trash2 className="w-4 h-4" />
-                </button>
-            </div>
-        ),
-    }));
-
     return (
         <div className="space-y-6">
-            {/* Page Header */}
-            <div className="page-header">
-                <div>
-                    <h1 className="text-2xl font-bold text-foreground">Quản lý người dùng</h1>
-                    <p className="text-muted mt-1">Quản lý tài khoản người dùng trong hệ thống</p>
-                </div>
-                <button
-                    onClick={openCreateModal}
-                    className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-md font-medium transition"
-                >
-                    <Plus className="w-4 h-4" />
-                    Thêm người dùng
-                </button>
-            </div>
+            <PageHeader
+                title={t('title')}
+                subtitle={t('subtitle')}
+                action={
+                    <button
+                        onClick={openCreateModal}
+                        className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-md font-medium transition"
+                    >
+                        <Plus className="w-4 h-4" />
+                        {t('create')}
+                    </button>
+                }
+            />
 
-            {/* Search */}
-            <div className="card p-4">
-                <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm người dùng..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="input pl-10"
-                    />
-                </div>
-            </div>
+            <SearchInput
+                value={list.search}
+                onChange={list.setSearch}
+                placeholder={t('searchPlaceholder')}
+            />
 
-            {/* Users Table */}
-            {loading ? (
+            <ErrorBanner message={list.error} />
+
+            {list.loading ? (
                 <PageLoading />
             ) : (
                 <PaginatedTable
-                    data={tableData}
+                    data={list.items}
                     columns={columns}
-                    page={page}
-                    pageSize={pageSize}
-                    total={total}
-                    onPageChange={setPage}
+                    page={list.page}
+                    pageSize={list.pageSize}
+                    total={list.total}
+                    onPageChange={list.setPage}
+                    emptyText={t('empty')}
                 />
             )}
 
-            {/* Create/Edit Modal */}
             <Modal
                 open={modalOpen}
-                onClose={() => {
-                    setModalOpen(false);
-                    setSelectedUser(null);
-                }}
-                title={selectedUser ? 'Sửa người dùng' : 'Thêm người dùng'}
+                onClose={closeModal}
+                title={isEdit ? t('form.editTitle') : t('form.createTitle')}
                 footer={
                     <>
                         <button
-                            onClick={() => {
-                                setModalOpen(false);
-                                setSelectedUser(null);
-                            }}
+                            onClick={closeModal}
                             className="px-4 py-2 text-sm font-medium text-muted bg-surface-alt rounded-md hover:bg-border transition"
                         >
-                            Hủy
+                            {tc('actions.cancel')}
                         </button>
                         <button
-                            onClick={() => {
-                                if (selectedUser) {
-                                    handleSubmit(handleUpdate)();
-                                } else {
-                                    handleCreateSubmit(handleCreate)();
-                                }
-                            }}
+                            onClick={handleSubmit(onSubmit)}
                             disabled={submitting}
                             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-hover rounded-md transition disabled:opacity-50"
                         >
                             {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                            {selectedUser ? 'Cập nhật' : 'Tạo mới'}
+                            {isEdit ? tc('actions.update') : tc('actions.create')}
                         </button>
                     </>
                 }
             >
-                <form className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                            Họ tên
-                        </label>
-                        <input
-                            {...register('fullName')}
-                            className={`input ${errors.fullName ? 'input-error' : ''}`}
-                            placeholder="Nhập họ tên"
-                        />
-                        {errors.fullName && (
-                            <p className="text-danger text-xs mt-1">{errors.fullName.message}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                            Email
-                        </label>
-                        <input
-                            {...register('email')}
-                            type="email"
-                            className={`input ${errors.email ? 'input-error' : ''}`}
-                            placeholder="Nhập email"
-                            disabled={!!selectedUser}
-                        />
-                        {errors.email && (
-                            <p className="text-danger text-xs mt-1">{errors.email.message}</p>
-                        )}
-                    </div>
-
-                    {!selectedUser && (
-                        <div>
-                            <label className="block text-sm font-medium text-foreground mb-2">
-                                Mật khẩu
-                            </label>
-                            <input
-                                {...registerCreate('password')}
-                                type="password"
-                                className={`input ${errorsCreate.password ? 'input-error' : ''}`}
-                                placeholder="Nhập mật khẩu"
-                            />
-                            {errorsCreate.password && (
-                                <p className="text-danger text-xs mt-1">
-                                    {errorsCreate.password.message}
-                                </p>
-                            )}
-                        </div>
-                    )}
-
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                            Vai trò
-                        </label>
-                        <select
-                            {...(selectedUser ? register('role') : registerCreate('role'))}
-                            className={`input ${(selectedUser ? errors.role : errorsCreate.role) ? 'input-error' : ''}`}
-                        >
-                            <option value="">Chọn vai trò</option>
-                            {roleOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                        {(selectedUser ? errors.role : errorsCreate.role) && (
-                            <p className="text-danger text-xs mt-1">
-                                {selectedUser ? errors.role?.message : errorsCreate.role?.message}
-                            </p>
-                        )}
-                    </div>
-                </form>
+                <UserFormFields register={register} errors={errors} isEdit={isEdit} />
             </Modal>
 
-            {/* Delete Confirmation Modal */}
             <ConfirmModal
                 open={deleteModalOpen}
                 onClose={() => setDeleteModalOpen(false)}
-                title="Xóa người dùng"
-                message={`Bạn có chắc chắn muốn xóa người dùng "${selectedUser?.fullName}" không? Hành động này không thể hoàn tác.`}
-                confirmText="Xóa"
+                title={t('delete.title')}
+                message={`${t('delete.message', { name: selected?.fullName ?? '' })} ${tc('confirm.cannotUndo')}`}
+                confirmText={tc('actions.delete')}
                 onConfirm={handleDelete}
                 danger
             />

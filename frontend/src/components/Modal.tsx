@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from '@/shared/i18n/useTranslation';
 
 interface ModalProps {
   open: boolean;
@@ -101,10 +102,10 @@ export function Modal({
 export function ConfirmModal({
   open,
   onClose,
-  title = 'Xác nhận',
+  title,
   message,
-  confirmText = 'Xác nhận',
-  cancelText = 'Hủy',
+  confirmText,
+  cancelText,
   onConfirm,
   danger = false,
 }: {
@@ -117,15 +118,16 @@ export function ConfirmModal({
   onConfirm: () => void;
   danger?: boolean;
 }) {
+  const { t } = useTranslation('common');
   return (
-    <Modal open={open} onClose={onClose} title={title} size="sm">
+    <Modal open={open} onClose={onClose} title={title ?? t('confirm.title')} size="sm">
       <p className="text-muted">{message}</p>
       <div className="flex justify-end gap-3 mt-6">
         <button
           onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-muted bg-surface-alt rounded-md hover:bg-border transition"
         >
-          {cancelText}
+          {cancelText ?? t('actions.cancel')}
         </button>
         <button
           onClick={() => {
@@ -138,7 +140,7 @@ export function ConfirmModal({
               : 'bg-primary hover:bg-primary-hover'
           }`}
         >
-          {confirmText}
+          {confirmText ?? t('actions.confirm')}
         </button>
       </div>
     </Modal>

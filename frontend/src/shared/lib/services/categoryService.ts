@@ -1,70 +1,45 @@
+import { createCrudService, unwrap } from './createCrudService';
 import { api } from '../axiosInstance';
 
 export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  parentId?: string;
-  children?: Category[];
-  documentCount?: number;
-  createdAt: string;
-  updatedAt: string;
+    id: string;
+    name: string;
+    slug: string;
+    description?: string;
+    parentId?: string;
+    children?: Category[];
+    documentCount?: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface CreateCategoryRequest {
-  name: string;
-  slug?: string;
-  description?: string;
-  parentId?: string;
+    name: string;
+    slug?: string;
+    description?: string;
+    parentId?: string;
 }
 
 export interface UpdateCategoryRequest {
-  name?: string;
-  slug?: string;
-  description?: string;
-  parentId?: string;
+    name?: string;
+    slug?: string;
+    description?: string;
+    parentId?: string;
 }
 
+// NOTE: The categories endpoint returns a tree (Category[]) not a paginated result,
+// so getAll from createCrudService is intentionally unused for the list view.
+// getCategories is kept as the canonical non-paginated fetcher for the tree page and dropdowns.
+const _crud = createCrudService<Category, CreateCategoryRequest, UpdateCategoryRequest>('/categories');
+
 export const categoryService = {
-  getCategories: async (): Promise<Category[]> => {
-    const res = await api.get('/categories');
-    if (res.data.success) {
-      return res.data.data;
-    }
-    throw new Error(res.data.message);
-  },
+    getById: _crud.getById,
+    create: _crud.create,
+    update: _crud.update,
+    remove: _crud.remove,
 
-  getCategory: async (id: string): Promise<Category> => {
-    const res = await api.get(`/categories/${id}`);
-    if (res.data.success) {
-      return res.data.data;
-    }
-    throw new Error(res.data.message);
-  },
-
-  createCategory: async (data: CreateCategoryRequest): Promise<Category> => {
-    const res = await api.post('/categories', data);
-    if (res.data.success) {
-      return res.data.data;
-    }
-    throw new Error(res.data.message);
-  },
-
-  updateCategory: async (id: string, data: UpdateCategoryRequest): Promise<Category> => {
-    const res = await api.put(`/categories/${id}`, data);
-    if (res.data.success) {
-      return res.data.data;
-    }
-    throw new Error(res.data.message);
-  },
-
-  deleteCategory: async (id: string): Promise<void> => {
-    const res = await api.delete(`/categories/${id}`);
-    if (!res.data.success) {
-      throw new Error(res.data.message);
-    }
-  },
+    /** Fetch all categories as a tree (non-paginated). Used by tree view and dropdowns. */
+    getCategories: async (): Promise<Category[]> => unwrap(await api.get('/categories')),
 };
 
 export default categoryService;

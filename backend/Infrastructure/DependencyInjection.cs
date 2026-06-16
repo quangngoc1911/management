@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+using ManagementSystem.Application.Contracts;
 using ManagementSystem.Application.Options;
 using ManagementSystem.Infrastructure.Persistence;
+using ManagementSystem.Infrastructure.Services;
 using ManagementSystem.Infrastructure.Interceptors; // 1. Thêm namespace chứa Interceptor
 
 
@@ -16,6 +18,9 @@ public static class DependencyInjection
     {
         // 2. Đăng ký Interceptor vào DI
         services.AddScoped<UpdateAuditableEntitiesInterceptor>();
+
+        // Read-side service cho dashboard (đọc trực tiếp từ DbContext)
+        services.AddScoped<IDashboardService, DashboardService>();
 
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {

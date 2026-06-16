@@ -38,6 +38,8 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .AsNoTracking()
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted);
     }
 

@@ -10,7 +10,7 @@ namespace ManagementSystem.Modules.Users.Presentation.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _service;

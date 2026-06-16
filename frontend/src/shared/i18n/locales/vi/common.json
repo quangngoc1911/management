@@ -1,0 +1,79 @@
+{
+  "appName": "DocSystem",
+  "actions": {
+    "create": "Thêm mới",
+    "edit": "Sửa",
+    "update": "Cập nhật",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "confirm": "Xác nhận",
+    "add": "Thêm",
+    "close": "Đóng",
+    "actions": "Thao tác"
+  },
+  "status": {
+    "label": "Trạng thái",
+    "active": "Hoạt động",
+    "inactive": "Ngưng hoạt động"
+  },
+  "table": {
+    "empty": "Không có dữ liệu",
+    "loading": "Đang tải...",
+    "showing": "Hiển thị {start}-{end} của {total} kết quả",
+    "page": "Trang {page} / {totalPages}"
+  },
+  "confirm": {
+    "title": "Xác nhận",
+    "cannotUndo": "Hành động này không thể hoàn tác."
+  },
+  "toast": {
+    "createSuccess": "Tạo mới thành công",
+    "updateSuccess": "Cập nhật thành công",
+    "deleteSuccess": "Xóa thành công"
+  },
+  "error": {
+    "generic": "Đã có lỗi xảy ra",
+    "load": "Không thể tải dữ liệu",
+    "save": "Lưu thất bại",
+    "delete": "Xóa thất bại"
+  },
+  "auth": {
+    "checking": "Đang kiểm tra phiên đăng nhập...",
+    "logout": "Đăng xuất"
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "nav": {
+    "dashboard": "Tổng quan",
+    "users": "Người dùng",
+    "familyMembers": "Thành viên gia đình",
+    "accounts": "Tài khoản tài chính",
+    "transactions": "Giao dịch",
+    "budgets": "Ngân sách",
+    "investments": "Đầu tư",
+    "recurringTransactions": "Giao dịch định kỳ",
+    "medicalRecords": "Hồ sơ y tế",
+    "medications": "Thuốc",
+    "healthMetrics": "Chỉ số sức khỏe",
+    "educationRecords": "Hồ sơ học tập",
+    "studySchedules": "Lịch học",
+    "familyEvents": "Sự kiện gia đình",
+    "assets": "Tài sản",
+    "assetValuations": "Định giá tài sản",
+    "reminders": "Nhắc nhở",
+    "bookmarks": "Đánh dấu",
+    "categories": "Danh mục",
+    "documents": "Tài liệu",
+    "documentsSearch": "Tìm kiếm",
+    "tags": "Tags",
+    "notifications": "Thông báo",
+    "systemConfigs": "Cấu hình hệ thống",
+    "auditLogs": "Nhật ký kiểm toán",
+    "backupLogs": "Nhật ký sao lưu",
+    "profile": "Hồ sơ"
+  }
+}

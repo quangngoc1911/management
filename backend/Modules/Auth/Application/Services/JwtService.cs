@@ -28,12 +28,22 @@ public class JwtService : IJwtService
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_settings.SecretKey));
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
             new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
         };
+
+        // Gắn role vào token để [Authorize(Roles = ...)] hoạt động.
+        // Yêu cầu user được nạp kèm UserRoles.Role (xem UserRepository.GetByEmailAsync).
+        foreach (var roleName in user.UserRoles
+                     .Where(ur => ur.Role != null && !string.IsNullOrWhiteSpace(ur.Role!.Name))
+                     .Select(ur => ur.Role!.Name)
+                     .Distinct())
+        {
+            claims.Add(new Claim(ClaimTypes.Role, roleName));
+        }
 
         var token = new JwtSecurityToken(
             issuer: _settings.Issuer,

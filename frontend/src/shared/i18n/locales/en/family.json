@@ -1,0 +1,150 @@
+{
+  "title": "Family Members",
+  "subtitle": "Manage profiles of your family members",
+  "create": "Add member",
+  "searchPlaceholder": "Search by name, nickname, phone, email...",
+  "empty": "No members yet",
+  "columns": {
+    "fullName": "Full name",
+    "relationToHead": "Relationship",
+    "gender": "Gender",
+    "phone": "Phone",
+    "isHouseholdHead": "Head"
+  },
+  "rowActions": {
+    "profile": "Detailed profile",
+    "relationships": "Family relationships"
+  },
+  "form": {
+    "createTitle": "Add member",
+    "editTitle": "Edit member",
+    "select": "-- Select --",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "Enter full name",
+    "nickname": "Nickname",
+    "nicknamePlaceholder": "Common name",
+    "dateOfBirth": "Date of birth",
+    "gender": "Gender",
+    "relationToHead": "Relation to head",
+    "phone": "Phone",
+    "phonePlaceholder": "Phone number",
+    "email": "Email",
+    "emailPlaceholder": "Email address",
+    "isHouseholdHead": "Is household head",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes about this member"
+  },
+  "validation": {
+    "fullNameMin": "Full name must be at least 2 characters",
+    "fullNameMax": "Full name must not exceed 200 characters",
+    "nicknameMax": "Nickname must not exceed 100 characters",
+    "phoneMax": "Phone must not exceed 20 characters",
+    "email": "Invalid email"
+  },
+  "delete": {
+    "title": "Delete member",
+    "message": "Are you sure you want to delete \"{name}\"?"
+  },
+  "toast": {
+    "created": "Member added",
+    "updated": "Member updated",
+    "deleted": "Member deleted"
+  },
+  "gender": {
+    "1": "Male",
+    "2": "Female",
+    "3": "Other"
+  },
+  "relationToHead": {
+    "0": "Household head",
+    "1": "Spouse",
+    "2": "Child",
+    "3": "Parent",
+    "4": "Sibling",
+    "5": "Grandparent",
+    "6": "Grandchild",
+    "7": "In-law",
+    "99": "Other"
+  },
+  "maritalStatus": {
+    "1": "Single",
+    "2": "Married",
+    "3": "Divorced",
+    "4": "Widowed",
+    "5": "Separated"
+  },
+  "educationLevel": {
+    "0": "None",
+    "1": "Primary",
+    "2": "Lower secondary",
+    "3": "Upper secondary",
+    "4": "Vocational",
+    "5": "College",
+    "6": "Bachelor",
+    "7": "Master",
+    "8": "Doctorate"
+  },
+  "relationshipType": {
+    "1": "Spouse",
+    "2": "Parent",
+    "3": "Child",
+    "4": "Sibling",
+    "5": "Grandparent",
+    "6": "Grandchild",
+    "7": "Aunt/Uncle",
+    "8": "Grandniece/nephew",
+    "9": "Cousin",
+    "10": "In-law",
+    "11": "Step-parent",
+    "12": "Step-child",
+    "13": "Adoptive parent",
+    "14": "Adopted child",
+    "99": "Other"
+  },
+  "profile": {
+    "title": "Detailed profile",
+    "titleNamed": "Detailed profile — {name}",
+    "loading": "Loading profile...",
+    "save": "Save profile",
+    "loadError": "Failed to load profile",
+    "saveError": "Failed to save profile",
+    "saved": "Profile saved",
+    "encryptedHint": "Encrypted on save",
+    "fields": {
+      "nationalId": "National ID",
+      "passportNo": "Passport No.",
+      "nationality": "Nationality",
+      "ethnicity": "Ethnicity",
+      "religion": "Religion",
+      "bloodType": "Blood type",
+      "maritalStatus": "Marital status",
+      "educationLevel": "Education level",
+      "occupation": "Occupation",
+      "birthPlace": "Birth place",
+      "heightCm": "Height (cm)",
+      "weightKg": "Weight (kg)",
+      "emergencyContactName": "Emergency contact",
+      "emergencyContactNamePlaceholder": "Contact name",
+      "emergencyContactPhone": "Emergency phone",
+      "currentAddress": "Current address",
+      "permanentAddress": "Permanent address",
+      "bio": "Bio"
+    }
+  },
+  "relationships": {
+    "title": "Family relationships",
+    "titleNamed": "Relationships — {name}",
+    "relatedMember": "-- Related member --",
+    "relationshipType": "-- Relationship type --",
+    "add": "Add",
+    "loading": "Loading...",
+    "empty": "No relationships yet",
+    "deleteTitle": "Delete relationship",
+    "selectRequired": "Please select a member and a relationship type",
+    "loadError": "Failed to load relationships",
+    "addError": "Failed to add relationship",
+    "deleteError": "Failed to delete relationship",
+    "added": "Relationship added",
+    "deleted": "Relationship deleted"
+  }
+}

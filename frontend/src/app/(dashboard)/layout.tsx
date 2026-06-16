@@ -6,11 +6,30 @@ import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard,
     Users,
+    UsersRound,
     FolderTree,
     FileText,
     Search,
     Tags,
     User,
+    Wallet,
+    ArrowLeftRight,
+    PiggyBank,
+    TrendingUp,
+    Repeat,
+    Stethoscope,
+    Pill,
+    HeartPulse,
+    GraduationCap,
+    CalendarClock,
+    CalendarHeart,
+    Package,
+    LineChart,
+    BellRing,
+    Bookmark,
+    Settings,
+    ScrollText,
+    DatabaseBackup,
     Menu,
     Bell,
     LogOut,
@@ -19,21 +38,45 @@ import {
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useTranslation } from '@/shared/i18n/useTranslation';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+// labelKey resolves against the `common.nav.*` namespace (see shared/i18n/locales).
 const menuItems = [
-    { href: '/dashboard', label: 'Tổng quan', icon: LayoutDashboard },
-    { href: '/users', label: 'Người dùng', icon: Users },
-    { href: '/categories', label: 'Danh mục', icon: FolderTree },
-    { href: '/documents', label: 'Tài liệu', icon: FileText },
-    { href: '/documents/search', label: 'Tìm kiếm', icon: Search },
-    { href: '/tags', label: 'Tags', icon: Tags },
-    { href: '/profile', label: 'Hồ sơ', icon: User },
+    { href: '/dashboard', labelKey: 'dashboard', icon: LayoutDashboard },
+    { href: '/users', labelKey: 'users', icon: Users },
+    { href: '/family-members', labelKey: 'familyMembers', icon: UsersRound },
+    { href: '/accounts', labelKey: 'accounts', icon: Wallet },
+    { href: '/transactions', labelKey: 'transactions', icon: ArrowLeftRight },
+    { href: '/budgets', labelKey: 'budgets', icon: PiggyBank },
+    { href: '/investments', labelKey: 'investments', icon: TrendingUp },
+    { href: '/recurring-transactions', labelKey: 'recurringTransactions', icon: Repeat },
+    { href: '/medical-records', labelKey: 'medicalRecords', icon: Stethoscope },
+    { href: '/medications', labelKey: 'medications', icon: Pill },
+    { href: '/health-metrics', labelKey: 'healthMetrics', icon: HeartPulse },
+    { href: '/education-records', labelKey: 'educationRecords', icon: GraduationCap },
+    { href: '/study-schedules', labelKey: 'studySchedules', icon: CalendarClock },
+    { href: '/family-events', labelKey: 'familyEvents', icon: CalendarHeart },
+    { href: '/assets', labelKey: 'assets', icon: Package },
+    { href: '/asset-valuations', labelKey: 'assetValuations', icon: LineChart },
+    { href: '/reminders', labelKey: 'reminders', icon: BellRing },
+    { href: '/bookmarks', labelKey: 'bookmarks', icon: Bookmark },
+    { href: '/categories', labelKey: 'categories', icon: FolderTree },
+    { href: '/documents', labelKey: 'documents', icon: FileText },
+    { href: '/documents/search', labelKey: 'documentsSearch', icon: Search },
+    { href: '/tags', labelKey: 'tags', icon: Tags },
+    { href: '/notifications', labelKey: 'notifications', icon: Bell },
+    { href: '/system-configs', labelKey: 'systemConfigs', icon: Settings },
+    { href: '/audit-logs', labelKey: 'auditLogs', icon: ScrollText },
+    { href: '/backup-logs', labelKey: 'backupLogs', icon: DatabaseBackup },
+    { href: '/profile', labelKey: 'profile', icon: User },
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const { user, logout, isAuthenticated, authLoading } = useAuth();
     const router = useRouter();
+    const { t } = useTranslation('common');
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Redirect to login when auth checked and not authenticated
@@ -46,7 +89,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     if (authLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="text-muted">Đang kiểm tra phiên đăng nhập...</div>
+                <div className="text-muted">{t('auth.checking')}</div>
             </div>
         );
     }
@@ -64,7 +107,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             {/* Sidebar */}
             <aside
                 className={`
-        fixed lg:static inset-y-0 left-0 z-sticky w-64 bg-sidebar flex flex-col 
+        fixed lg:static inset-y-0 left-0 z-sticky w-64 bg-sidebar flex flex-col
         transform transition-transform duration-200 lg:transform-none
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}
@@ -72,7 +115,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 {/* Logo */}
                 <div className="flex items-center justify-between px-4 py-5 border-b border-sidebar-border">
                     <Link href="/dashboard" className="text-white font-bold text-base">
-                        DocSystem
+                        {t('appName')}
                     </Link>
                     <button
                         onClick={() => setSidebarOpen(false)}
@@ -105,7 +148,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 `}
                             >
                                 <Icon className="w-5 h-5" />
-                                <span>{item.label}</span>
+                                <span>{t(`nav.${item.labelKey}`)}</span>
                             </Link>
                         );
                     })}
@@ -132,7 +175,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                        text-danger hover:bg-sidebar-border transition text-left"
                     >
                         <LogOut className="w-5 h-5" />
-                        <span>Đăng xuất</span>
+                        <span>{t('auth.logout')}</span>
                     </button>
                 </div>
             </aside>
@@ -140,7 +183,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Top Navbar */}
-                <header className="sticky top-0 z-sticky flex items-center gap-4 px-4 lg:px-8 py-4 bg-background border-b border-border">
+                <header className="sticky top-0 z-sticky flex items-center gap-2 px-4 lg:px-8 py-4 bg-background border-b border-border">
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setSidebarOpen(true)}
@@ -151,6 +194,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
                     {/* Spacer */}
                     <div className="flex-1" />
+
+                    {/* Language */}
+                    <LanguageSwitcher />
 
                     {/* Notifications */}
                     <button className="relative p-2 text-muted hover:text-foreground rounded-md hover:bg-surface-alt transition">
@@ -165,4 +211,3 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
     );
 }
-

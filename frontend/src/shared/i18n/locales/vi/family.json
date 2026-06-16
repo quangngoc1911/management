@@ -1,0 +1,150 @@
+{
+  "title": "Thành viên gia đình",
+  "subtitle": "Quản lý hồ sơ các thành viên trong gia đình",
+  "create": "Thêm thành viên",
+  "searchPlaceholder": "Tìm theo tên, biệt danh, điện thoại, email...",
+  "empty": "Chưa có thành viên nào",
+  "columns": {
+    "fullName": "Họ tên",
+    "relationToHead": "Quan hệ",
+    "gender": "Giới tính",
+    "phone": "Điện thoại",
+    "isHouseholdHead": "Chủ hộ"
+  },
+  "rowActions": {
+    "profile": "Hồ sơ chi tiết",
+    "relationships": "Quan hệ gia đình"
+  },
+  "form": {
+    "createTitle": "Thêm thành viên",
+    "editTitle": "Sửa thành viên",
+    "select": "-- Chọn --",
+    "fullName": "Họ tên",
+    "fullNamePlaceholder": "Nhập họ tên đầy đủ",
+    "nickname": "Biệt danh",
+    "nicknamePlaceholder": "Tên thường gọi",
+    "dateOfBirth": "Ngày sinh",
+    "gender": "Giới tính",
+    "relationToHead": "Quan hệ với chủ hộ",
+    "phone": "Điện thoại",
+    "phonePlaceholder": "Số điện thoại",
+    "email": "Email",
+    "emailPlaceholder": "Địa chỉ email",
+    "isHouseholdHead": "Là chủ hộ",
+    "notes": "Ghi chú",
+    "notesPlaceholder": "Ghi chú thêm về thành viên"
+  },
+  "validation": {
+    "fullNameMin": "Họ tên phải có ít nhất 2 ký tự",
+    "fullNameMax": "Họ tên không được vượt quá 200 ký tự",
+    "nicknameMax": "Biệt danh tối đa 100 ký tự",
+    "phoneMax": "Số điện thoại tối đa 20 ký tự",
+    "email": "Email không hợp lệ"
+  },
+  "delete": {
+    "title": "Xóa thành viên",
+    "message": "Bạn có chắc chắn muốn xóa \"{name}\" không?"
+  },
+  "toast": {
+    "created": "Đã thêm thành viên",
+    "updated": "Đã cập nhật thành viên",
+    "deleted": "Đã xóa thành viên"
+  },
+  "gender": {
+    "1": "Nam",
+    "2": "Nữ",
+    "3": "Khác"
+  },
+  "relationToHead": {
+    "0": "Chủ hộ",
+    "1": "Vợ/Chồng",
+    "2": "Con",
+    "3": "Cha/Mẹ",
+    "4": "Anh/Chị/Em",
+    "5": "Ông/Bà",
+    "6": "Cháu",
+    "7": "Thông gia",
+    "99": "Khác"
+  },
+  "maritalStatus": {
+    "1": "Độc thân",
+    "2": "Đã kết hôn",
+    "3": "Ly hôn",
+    "4": "Goá",
+    "5": "Ly thân"
+  },
+  "educationLevel": {
+    "0": "Không",
+    "1": "Tiểu học",
+    "2": "THCS",
+    "3": "THPT",
+    "4": "Trung cấp",
+    "5": "Cao đẳng",
+    "6": "Đại học",
+    "7": "Thạc sĩ",
+    "8": "Tiến sĩ"
+  },
+  "relationshipType": {
+    "1": "Vợ/Chồng",
+    "2": "Cha/Mẹ",
+    "3": "Con",
+    "4": "Anh/Chị/Em",
+    "5": "Ông/Bà",
+    "6": "Cháu (nội/ngoại)",
+    "7": "Cô/Dì/Chú/Bác",
+    "8": "Cháu họ",
+    "9": "Anh/Chị/Em họ",
+    "10": "Thông gia",
+    "11": "Cha/Mẹ kế",
+    "12": "Con kế",
+    "13": "Cha/Mẹ nuôi",
+    "14": "Con nuôi",
+    "99": "Khác"
+  },
+  "profile": {
+    "title": "Hồ sơ chi tiết",
+    "titleNamed": "Hồ sơ chi tiết — {name}",
+    "loading": "Đang tải hồ sơ...",
+    "save": "Lưu hồ sơ",
+    "loadError": "Không tải được hồ sơ",
+    "saveError": "Lưu hồ sơ thất bại",
+    "saved": "Đã lưu hồ sơ",
+    "encryptedHint": "Được mã hoá khi lưu",
+    "fields": {
+      "nationalId": "Số CMND/CCCD",
+      "passportNo": "Số hộ chiếu",
+      "nationality": "Quốc tịch",
+      "ethnicity": "Dân tộc",
+      "religion": "Tôn giáo",
+      "bloodType": "Nhóm máu",
+      "maritalStatus": "Tình trạng hôn nhân",
+      "educationLevel": "Trình độ học vấn",
+      "occupation": "Nghề nghiệp",
+      "birthPlace": "Nơi sinh",
+      "heightCm": "Chiều cao (cm)",
+      "weightKg": "Cân nặng (kg)",
+      "emergencyContactName": "Liên hệ khẩn cấp",
+      "emergencyContactNamePlaceholder": "Tên người liên hệ",
+      "emergencyContactPhone": "SĐT khẩn cấp",
+      "currentAddress": "Địa chỉ hiện tại",
+      "permanentAddress": "Địa chỉ thường trú",
+      "bio": "Giới thiệu"
+    }
+  },
+  "relationships": {
+    "title": "Quan hệ gia đình",
+    "titleNamed": "Quan hệ — {name}",
+    "relatedMember": "-- Thành viên liên quan --",
+    "relationshipType": "-- Loại quan hệ --",
+    "add": "Thêm",
+    "loading": "Đang tải...",
+    "empty": "Chưa có quan hệ nào",
+    "deleteTitle": "Xóa quan hệ",
+    "selectRequired": "Vui lòng chọn thành viên và loại quan hệ",
+    "loadError": "Không tải được quan hệ",
+    "addError": "Thêm quan hệ thất bại",
+    "deleteError": "Xóa quan hệ thất bại",
+    "added": "Đã thêm quan hệ",
+    "deleted": "Đã xóa quan hệ"
+  }
+}

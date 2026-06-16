@@ -1,0 +1,45 @@
+{
+  "title": "Quản lý người dùng",
+  "subtitle": "Quản lý tài khoản người dùng trong hệ thống",
+  "create": "Thêm người dùng",
+  "searchPlaceholder": "Tìm kiếm người dùng...",
+  "empty": "Chưa có người dùng nào",
+  "columns": {
+    "fullName": "Họ tên",
+    "email": "Email",
+    "role": "Vai trò",
+    "status": "Trạng thái"
+  },
+  "form": {
+    "createTitle": "Thêm người dùng",
+    "editTitle": "Sửa người dùng",
+    "fullName": "Họ tên",
+    "fullNamePlaceholder": "Nhập họ tên",
+    "email": "Email",
+    "emailPlaceholder": "Nhập email",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "role": "Vai trò",
+    "rolePlaceholder": "Chọn vai trò"
+  },
+  "roles": {
+    "admin": "Quản trị viên",
+    "editor": "Biên tập viên",
+    "user": "Người dùng"
+  },
+  "validation": {
+    "email": "Email không hợp lệ",
+    "fullNameMin": "Họ tên phải có ít nhất 2 ký tự",
+    "roleRequired": "Vui lòng chọn vai trò",
+    "passwordMin": "Mật khẩu phải có ít nhất 6 ký tự"
+  },
+  "delete": {
+    "title": "Xóa người dùng",
+    "message": "Bạn có chắc chắn muốn xóa người dùng \"{name}\" không?"
+  },
+  "toast": {
+    "created": "Đã thêm người dùng",
+    "updated": "Đã cập nhật người dùng",
+    "deleted": "Đã xóa người dùng"
+  }
+}

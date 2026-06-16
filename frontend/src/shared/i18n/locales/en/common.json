@@ -1,0 +1,79 @@
+{
+  "appName": "DocSystem",
+  "actions": {
+    "create": "Create",
+    "edit": "Edit",
+    "update": "Update",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "add": "Add",
+    "close": "Close",
+    "actions": "Actions"
+  },
+  "status": {
+    "label": "Status",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "table": {
+    "empty": "No data",
+    "loading": "Loading...",
+    "showing": "Showing {start}-{end} of {total} results",
+    "page": "Page {page} / {totalPages}"
+  },
+  "confirm": {
+    "title": "Confirm",
+    "cannotUndo": "This action cannot be undone."
+  },
+  "toast": {
+    "createSuccess": "Created successfully",
+    "updateSuccess": "Updated successfully",
+    "deleteSuccess": "Deleted successfully"
+  },
+  "error": {
+    "generic": "Something went wrong",
+    "load": "Unable to load data",
+    "save": "Failed to save",
+    "delete": "Failed to delete"
+  },
+  "auth": {
+    "checking": "Checking your session...",
+    "logout": "Log out"
+  },
+  "language": {
+    "label": "Language",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "familyMembers": "Family Members",
+    "accounts": "Financial Accounts",
+    "transactions": "Transactions",
+    "budgets": "Budgets",
+    "investments": "Investments",
+    "recurringTransactions": "Recurring Transactions",
+    "medicalRecords": "Medical Records",
+    "medications": "Medications",
+    "healthMetrics": "Health Metrics",
+    "educationRecords": "Education Records",
+    "studySchedules": "Study Schedules",
+    "familyEvents": "Family Events",
+    "assets": "Assets",
+    "assetValuations": "Asset Valuations",
+    "reminders": "Reminders",
+    "bookmarks": "Bookmarks",
+    "categories": "Categories",
+    "documents": "Documents",
+    "documentsSearch": "Search",
+    "tags": "Tags",
+    "notifications": "Notifications",
+    "systemConfigs": "System Settings",
+    "auditLogs": "Audit Logs",
+    "backupLogs": "Backup Logs",
+    "profile": "Profile"
+  }
+}

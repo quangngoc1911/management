@@ -1,12 +1,25 @@
 using ManagementSystem.Application;
 using ManagementSystem.Infrastructure;
 using ManagementSystem.Application.Mappings;
+using ManagementSystem.Application.DTOs.Common;
+using ManagementSystem.Infrastructure.Persistence;
+
+using Microsoft.EntityFrameworkCore;
+
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
+using Microsoft.AspNetCore.Mvc;
 
 using Scalar.AspNetCore;
 
 using Serilog;
 
 using Hellang.Middleware.ProblemDetails;
+
+// Cho phép ghi DateTime (Kind=Unspecified/Local) vào cột 'timestamp with time zone' của PostgreSQL.
+// Mặc định Npgsql chỉ chấp nhận UTC; bật legacy behavior để DateTime do client gửi lên được xử lý như UTC.
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Khởi tạo logger ngay từ đầu để bắt được cả lỗi khởi động hệ thống
 Log.Logger = new LoggerConfiguration()
@@ -45,7 +58,11 @@ try
     // ==========================================================================
 
     // Cấu hình Controllers và xử lý JSON (tránh lỗi vòng lặp và giữ nguyên định dạng ký tự)
-    builder.Services.AddControllers()
+    builder.Services.AddControllers(options =>
+        {
+            // Giữ nguyên hậu tố "Async" trong tên action để CreatedAtAction(nameof(XxxAsync)) khớp route
+            options.SuppressAsyncSuffixInActionNames = false;
+        })
         .AddJsonOptions(options =>
         {
             // Cho phép hiển thị các ký tự đặc biệt (tiếng Việt) mà không bị mã hóa thành \uXXXX
@@ -53,6 +70,31 @@ try
             // Ngăn lỗi vòng lặp vô tận khi các Object tham chiếu lẫn nhau (như Category -> Product -> Category)
             options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         });
+
+    // Kích hoạt FluentValidation: tự động chạy validator theo DTO khi model binding
+    builder.Services.AddFluentValidationAutoValidation();
+    // Quét và đăng ký toàn bộ validator trong assembly (mỗi DTO một validator)
+    builder.Services.AddValidatorsFromAssembly(typeof(AutoMapperProfile).Assembly);
+
+    // Đồng nhất định dạng lỗi validation về chung envelope ApiResponseDto (thay cho ProblemDetails mặc định)
+    builder.Services.Configure<ApiBehaviorOptions>(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(entry => entry.Value is not null && entry.Value.Errors.Count > 0)
+                .SelectMany(entry => entry.Value!.Errors.Select(error => error.ErrorMessage))
+                .Where(message => !string.IsNullOrWhiteSpace(message))
+                .ToList();
+
+            var response = ApiResponseDto<object>.ErrorResult(
+                "Dữ liệu không hợp lệ",
+                StatusCodes.Status400BadRequest,
+                errors);
+
+            return new BadRequestObjectResult(response);
+        };
+    });
 
     // Đăng ký AutoMapper để tự động chuyển đổi dữ liệu giữa Entity và DTO
     builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
@@ -135,6 +177,15 @@ try
 
     // Xây dựng ứng dụng sau khi đã đăng ký tất cả dịch vụ
     var app = builder.Build();
+
+    // Tự động áp migration còn thiếu và seed dữ liệu nền (idempotent) khi khởi động
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await dbContext.Database.MigrateAsync();
+        await DataSeeder.SeedAsync(dbContext);
+        Log.Information("Database migrated and seeded");
+    }
 
     // ==========================================================================
     // 2. CẤU HÌNH PIPELINE (MIDDLEWARE) - Thứ tự ở đây cực kỳ quan trọng!

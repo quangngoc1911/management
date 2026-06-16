@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ManagementSystem.Modules.Categories.Presentation.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/categories")]
 [Authorize]
 public class CategoryController : ControllerBase
 {

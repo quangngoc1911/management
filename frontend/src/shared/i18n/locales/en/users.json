@@ -1,0 +1,45 @@
+{
+  "title": "User Management",
+  "subtitle": "Manage user accounts in the system",
+  "create": "Add user",
+  "searchPlaceholder": "Search users...",
+  "empty": "No users yet",
+  "columns": {
+    "fullName": "Full name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status"
+  },
+  "form": {
+    "createTitle": "Add user",
+    "editTitle": "Edit user",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "Enter full name",
+    "email": "Email",
+    "emailPlaceholder": "Enter email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "role": "Role",
+    "rolePlaceholder": "Select a role"
+  },
+  "roles": {
+    "admin": "Administrator",
+    "editor": "Editor",
+    "user": "User"
+  },
+  "validation": {
+    "email": "Invalid email",
+    "fullNameMin": "Full name must be at least 2 characters",
+    "roleRequired": "Please select a role",
+    "passwordMin": "Password must be at least 6 characters"
+  },
+  "delete": {
+    "title": "Delete user",
+    "message": "Are you sure you want to delete user \"{name}\"?"
+  },
+  "toast": {
+    "created": "User added",
+    "updated": "User updated",
+    "deleted": "User deleted"
+  }
+}

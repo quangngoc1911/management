@@ -11,6 +11,8 @@ public static class DependencyInjection
     {
         services.AddScoped<IDocumentService, DocumentService>();
         services.AddScoped<IDocumentRepository, DocumentRepository>();
+        services.AddScoped<ITagService, TagService>();
+        services.AddScoped<ITagRepository, TagRepository>();
         return services;
     }
 }

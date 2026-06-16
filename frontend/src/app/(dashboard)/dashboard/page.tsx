@@ -48,23 +48,6 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.error('Failed to fetch stats:', error);
-        // Use mock data for demo
-        setStats({
-          totalUsers: 12,
-          totalDocuments: 156,
-          totalCategories: 24,
-          totalTags: 48,
-          documentsByStatus: {
-            draft: 23,
-            published: 118,
-            archived: 15,
-          },
-          recentDocuments: [
-            { id: '1', title: 'Hướng dẫn sử dụng hệ thống', status: 'published', createdAt: '2024-01-15' },
-            { id: '2', title: 'Quy trình quản lý tài liệu', status: 'published', createdAt: '2024-01-14' },
-            { id: '3', title: 'Chính sách bảo mật', status: 'draft', createdAt: '2024-01-13' },
-          ],
-        });
       } finally {
         setLoading(false);
       }
